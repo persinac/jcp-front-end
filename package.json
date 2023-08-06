@@ -24,8 +24,10 @@
     "webpack-cli": "latest"
   },
   "scripts": {
-    "start-dev": "webpack serve --open --hot --config webpack.dev.js --env ENVIRONMENT=development",
+    "start:dev": "webpack serve --open --hot --config webpack.dev.js --env ENVIRONMENT=development",
+    "build-local": "webpack --config webpack.dev.js",
     "build": "webpack --config webpack.production.js",
+    "start:local-prod": "npm run build-local && node server.js",
     "start:prod": "node server.js",
     "postinstall": "semantic-ui-css-patch"
   },
