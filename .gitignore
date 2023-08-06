@@ -28,5 +28,9 @@ yarn-error.log*
 
 # Project exclude paths
 /dist/
-
+*.log
 aws-config.md
+ecosystem.dev.config.cjs
+ecosystem.config.cjs
+nginx.md
+*.sh
