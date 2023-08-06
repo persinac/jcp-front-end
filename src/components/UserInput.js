@@ -1,8 +1,11 @@
 import React, {useEffect, useState} from "react";
-import {Dropdown, Grid, Input} from "semantic-ui-react";
+import SemanticDatepicker from 'react-semantic-ui-datepickers';
+import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
+import {Button, Card, Checkbox, Container, Divider, Icon, Input, Form, TextArea} from "semantic-ui-react";
 import ButtonComponent from "./General/Button";
 import MovementInput from "./Movement";
 import MovementListComponent from "./MovementList";
+import {postProgramAndSchedule} from "../api";
 
 /*****
  * How could we make the input easier to use? Make is a self contained function with its own state
@@ -12,8 +15,10 @@ const UserInput = () => {
     // the key with this type of setup is that we need a line & f(x) for each input
     const [programName, setProgramName] = useState("");
     const [programType, setProgramType] = useState("");
-    const [programStartDate, setProgramStartDate] = useState("");
-    const [programEndDate, setProgramEndDate] = useState("");
+    const [programDescription, setProgramDescription] = useState("");
+    const [programScheduleStartDate, setProgramScheduleStartDate] = useState("");
+    const [programScheduleEndDate, setProgramScheduleEndDate] = useState("");
+    const [programScheduleProgramID, setProgramScheduleProgramID] = useState(null);
     const [modList, setModList] = useState([]);
     const [modAttrList, setModAttrList] = useState([]);
     const [file, setFile] = useState(null);
@@ -171,24 +176,30 @@ const UserInput = () => {
             });
     }
 
-    const postBuildData = () => {
-        fetch(`https://destinybuildcraft.io/api/build`,
-            {
-                method: "POST",
-                body: JSON.stringify({"mod_ids": helmBuildData}),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((apiData) => {
-                console.log(apiData)
-                apiData.json().then((moreData) => {
-                    console.log(moreData)
-                    setRawBuildData(moreData.data)
-                })
-
-            });
+    const postProgram = () => {
+        postProgramAndSchedule(programName, programType, programDescription, programScheduleStartDate, programScheduleEndDate)
+            .then((data) => {console.log(data)})
     }
+
+    const programNameInputHandler = (e) => {
+        setProgramName(e.target.value);
+    };
+
+    const programTypeInputHandler = (e) => {
+        setProgramType(e.target.value);
+    };
+
+    const programDescriptionInputHandler = (e) => {
+        setProgramDescription(e.target.value);
+    };
+
+    const programScheduleStartDateInputHandler = (event, data) => {
+        setProgramScheduleStartDate(data.value);
+    };
+
+    const programScheduleEndDateInputHandler = (event, data) => {
+        setProgramScheduleEndDate(data.value);
+    };
 
     /***
      * Flow:
@@ -200,39 +211,33 @@ const UserInput = () => {
     return (
         <div>
             <div className="d-flex flex-row justify-content-center">
-                <h2>Inputs</h2>
+                <h2>New Program</h2>
             </div>
+            <Form>
+                <Form.Group style={{ display: "flex" }}>
+                    <Form.Field style={{ flexGrow: "1" }}>
+                        <Input placeholder='Program name' value={programName} onChange={programNameInputHandler}/>
+                    </Form.Field>
+                    <Form.Field style={{ flexGrow: "1" }}>
+                        <Input placeholder='Program Type' value={programType} onChange={programTypeInputHandler}/>
+                    </Form.Field>
+                </Form.Group>
+                <Form.Group style={{ display: "flex" }}>
+                    <Form.Field style={{ flexGrow: "1" }}>
+                        <SemanticDatepicker  placeholder='Start Date' value={programScheduleStartDate} onChange={programScheduleStartDateInputHandler}/>
+                    </Form.Field>
+                    <Form.Field style={{ flexGrow: "1" }}>
+                        <SemanticDatepicker  placeholder='End Date' value={programScheduleEndDate} onChange={programScheduleEndDateInputHandler}/>
+                    </Form.Field>
+                </Form.Group>
+                <Form.Group style={{ display: "flex" }}>
+                    <Form.Field style={{ flexGrow: "1" }}>
+                        <TextArea iconPosition='left' placeholder='Program Description' value={programDescription} onChange={programDescriptionInputHandler}/>
+                    </Form.Field>
+                </Form.Group>
+            </Form>
             <div>
-                <Grid verticalAlign={"middle"}>
-                    <Grid.Row columns={2}>
-                        <Grid.Column>
-                            <div>
-                                <Input type="text" placeholder="Program Name" onChange={(e) => setProgramName(e.target.value)} />
-                            </div>
-                        </Grid.Column>
-                        <Grid.Column>
-                            <div>
-                                <input type="text" placeholder="Program Type" onChange={(e) => setProgramType(e.target.value)} />
-                            </div>
-                        </Grid.Column>
-                    </Grid.Row>
-                </Grid>
-                <Grid verticalAlign={"middle"}>
-                    <Grid.Row columns={2}>
-                        <Grid.Column>
-                            <div>
-                                <input type="text" placeholder="Program Start Date" onChange={(e) => setProgramStartDate(e.target.value)} />
-                            </div>
-                        </Grid.Column>
-                        <Grid.Column>
-                            <div>
-                                <input type="text" placeholder="Program Start Date" onChange={(e) => setProgramEndDate(e.target.value)} />
-                            </div>
-                        </Grid.Column>
-                    </Grid.Row>
-                </Grid>
-                <MovementListComponent />
-                <ButtonComponent onClickFunction={postBuildData} label={"Submit"}/>
+                {/*<MovementListComponent />*/}
                 {/*<div className={`col-md-4 mb-3`}>*/}
                 {/*    <Dropdown>*/}
                 {/*        <Dropdown.Toggle variant="success" id="dropdown-basic">*/}
@@ -263,7 +268,7 @@ const UserInput = () => {
                 {/*</div>*/}
             </div>
             <div>
-                {outputRawAsStuff()}
+                <ButtonComponent onClickFunction={postProgram} label={"Submit"}/>
             </div>
         </div>
     )
