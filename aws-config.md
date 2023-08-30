@@ -24,7 +24,7 @@ docker push 059039070213.dkr.ecr.us-east-1.amazonaws.com/jcp-ui
 4. log into ec2 instance
 5. stop & rm the container
 6. pull new image
-7. restart container
+7. restart containerw
 
 ## Useful commands
 ```
