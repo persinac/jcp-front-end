@@ -31,18 +31,24 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
         };
 
         return (
-            <Card>
-                <Card.Header>Day {day}</Card.Header>
-                <Card.Description>
-                    {initialMovements.map((movement, index) => (
-                        <div key={movement.id}>
-                            <Input
-                                value={movement.movement_description}
-                                onChange={(e) => updateMovement(index, e.target.value)}
-                            />
-                        </div>
-                    ))}
-                </Card.Description>
+            <Card fluid>
+                <Card.Content>
+                    <Card.Header>Day {day}</Card.Header>
+                    <Card.Description>
+                        {initialMovements.map((movement, index) => (
+                            <div key={movement.id}>
+                                <Input fluid={true}
+                                    value={movement.movement_description}
+                                    onChange={(e) => updateMovement(index, e.target.value)}
+                                />
+                                <Input fluid={true}
+                                       value={movement.movement_notes}
+                                       onChange={(e) => updateMovement(index, e.target.value)}
+                                />
+                            </div>
+                        ))}
+                    </Card.Description>
+                </Card.Content>
                 <Card.Content extra>
                     <div className='ui two buttons'>
                         <Button basic color='green' onClick={() => handleSubmit(movements, true)}>
@@ -100,11 +106,11 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
     const WorkoutMovement = ({week, day, movements}) => {
         // if isEdit && week == weekToEdit && day == dayToEdit
         let showEditComponent = false;
-        if(isEdit && weekEdit == week && dayEdit == day) {
+        if (isEdit && weekEdit == week && dayEdit == day) {
             showEditComponent = true
         }
         return showEditComponent ? <EditWorkout handleSubmit={handleSubmit} day={day}
-                                     initialMovements={movementsToEdit}/> :
+                                                initialMovements={movementsToEdit}/> :
             <WorkoutCard week={week} day={day} movements={movements}/>
     }
 
@@ -113,14 +119,31 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
         if (isMobile) {
             itemsPurRow = undefined
         }
+        let weekAndDayMovements;
+        let showEditComponent = false;
+        if (isEdit && weekEdit == week) {
+            showEditComponent = true
+            weekAndDayMovements = workoutDetails.filter((dayMovements) => {
+                if(dayMovements.day == dayEdit) {
+                    return dayMovements
+                }
+            })
+            if(weekAndDayMovements.length > 0) {
+                weekAndDayMovements = weekAndDayMovements[0].movements
+            }
+        }
         return (
             <Card.Content>
                 <Card.Header className={"week-card"}>Week {week}</Card.Header>
-                <Card.Group itemsPerRow={itemsPurRow}>
-                    {workoutDetails ? workoutDetails.map(item => (
-                        <WorkoutMovement week={week} day={item.day} movements={item.movements}/>
-                    )) : <Card.Description/>}
-                </Card.Group>
+                {
+                    showEditComponent ? <EditWorkout handleSubmit={handleSubmit} day={dayEdit}
+                                                     initialMovements={weekAndDayMovements}/> :
+                        <Card.Group itemsPerRow={itemsPurRow}>
+                            {workoutDetails ? workoutDetails.map(item => (
+                                <WorkoutMovement week={week} day={item.day} movements={item.movements}/>
+                            )) : <Card.Description/>}
+                        </Card.Group>
+                }
             </Card.Content>
 
         );
