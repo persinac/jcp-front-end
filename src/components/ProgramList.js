@@ -2,12 +2,10 @@ import React, {useEffect, useState} from "react";
 import {getProgramCount, getPrograms} from "../api"
 import { Pagination } from 'semantic-ui-react';
 import {Table} from "semantic-ui-react";
-import '../sidecar.css'; // ccustom CSS file
 
 
-const ProgramList = ({handleShowProgramDetails, programData}) => {
+const ProgramList = ({handleShowProgramDetails, programPageHandler, programData, activeProgramPage}) => {
     const [programDataCount, setProgramDataCount] = useState(0);
-    const [activeProgramPage, setActiveProgramPage] = useState(1);
 
     useEffect(() => {
         getProgramCount('programs')
@@ -15,13 +13,6 @@ const ProgramList = ({handleShowProgramDetails, programData}) => {
         getPrograms(1, "DESC")
             .then(response => setProgramData(response))
     }, []);
-
-
-    const programPageHandler = (e, pageInfo) => {
-        setActiveProgramPage(pageInfo.activePage)
-        getPrograms(activeProgramPage, "DESC")
-            .then(response => setProgramData(response))
-    };
 
     const programDataColumns = () => {
         return [

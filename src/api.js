@@ -56,7 +56,7 @@ export const getProgramScheduleByProgramId = async (programId, currentPage, sort
 }
 
 export const getWorkoutsByProgramId = async (programId) => {
-    const response = await fetch(`${process.env.API_URL}/program-workout/program/${programId}`,
+    const response = await fetch(`${process.env.API_URL}/program-workout/program/${programId}?pageSize=1000`,
         {
             method: "GET",
             headers: {}
