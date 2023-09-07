@@ -60,7 +60,7 @@ const Programs = () => {
                     <ProgramList handleShowProgramDetails={handleShowProgramDetails}
                                  programPageHandler={programPageHandler} programData={programData}
                                  activeProgramPage={activeProgramPage}/> :
-                    <ProgramContext.Provider value={{ currentProgram, handleBackClick }}>
+                    <ProgramContext.Provider value={{ currentProgram, handleBackClick, setCurrentProgram }}>
                         <ProgramDetails />
                     </ProgramContext.Provider>
                 }

@@ -87,7 +87,6 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
             })
         })
         const removalResults = await removeWorkouts(movementsToRemove.flat())
-        console.log(removalResults)
 
         const weeksToUpdate = updatedWorkoutData.filter((weeks) => {
             return weeks.week > week

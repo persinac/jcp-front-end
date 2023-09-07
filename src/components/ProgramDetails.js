@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import {getProgramScheduleByProgramId, getWorkoutsByProgramId} from "../api"
-import {Button, Card, Header, Icon, Input, Label} from "semantic-ui-react";
+import {Button, Card, Form, Header, Icon, Input, Label} from "semantic-ui-react";
 import '../sidecar.css'; // custom CSS file
 import {ProgramContext, WorkoutContext} from '../programContext';
 import WorkoutComponent from "./WorkoutComponent";
@@ -16,11 +16,49 @@ const FormattedProgramSchedule = ({data}) => {
     );
 };
 
+const EditProgram = ({isMobile, currentProgram, handleProgramEdit, updateProgram}) => {
+    return (
+        <Card.Group itemsPerRow={isMobile ? undefined : 2}>
+            <Card fluid color='red'>
+                <Card.Header>Program</Card.Header>
+                <Card.Content>
+                    <Card.Description>
+                        <Form.Group widths='equal'>
+                            <Form.Input fluid label='Name' placeholder='Phase 1 - Volume'
+                                        value={currentProgram.name}
+                                        onChange={(e) => updateProgram(e.target.value, "name")}
+                            />
+                            <Form.Input fluid label='Description' placeholder='8 rep maxes for everyone'
+                                        value={currentProgram.description}
+                                        onChange={(e) => updateProgram(e.target.value, "description")}
+                            />
+                        </Form.Group>
+                    </Card.Description>
+                </Card.Content>
+                <Card.Content extra>
+                    <div className='ui two buttons'>
+                        <Button basic color='green' onClick={() => handleProgramEdit(currentProgram)}>
+                            Submit
+                        </Button>
+                        <Button basic color='red' onClick={() => handleProgramEdit(currentProgram)}>
+                            Cancel
+                        </Button>
+                    </div>
+                </Card.Content>
+            </Card>
+            <Card fluid color='red'>
+                <FormattedProgramSchedule data={formattedProgramDetails}/>
+            </Card>
+        </Card.Group>
+    );
+};
+
 
 const ProgramDetails = () => {
 
     // context from parent
     const { currentProgram } = useContext(ProgramContext);
+    const { setCurrentProgram } = useContext(ProgramContext);
     const { handleBackClick } = useContext(ProgramContext);
 
     const [rawProgramDetails, setRawProgramDetails] = useState([]);
@@ -28,6 +66,7 @@ const ProgramDetails = () => {
     const [rawWorkouts, setRawWorkouts] = useState([]);
     const [formattedWorkouts, setFormattedWorkouts] = useState([]);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [repeat, setRepeat] = useState(false);
     const [didEdit, setDidEdit] = useState(0);
 
     useEffect(() => {
@@ -122,6 +161,16 @@ const ProgramDetails = () => {
         setFormattedProgramDetails(concatenatedString)
         setFormattedWorkouts(restructuredData)
     }, [rawProgramDetails, rawWorkouts])
+
+    const updateProgram = (value, attribute) => {
+        const program = [...currentProgram];
+        program[attribute] = value;
+        setCurrentProgram(program);
+    }
+
+    const handleProgramEdit = () => {
+
+    }
 
     return (
         <div className={"div-card-parent"}>
