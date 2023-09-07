@@ -64,6 +64,39 @@ export const getWorkoutsByProgramId = async (programId) => {
     return await response.json()
 }
 
+export const createNewWorkouts = async (listOfNewWorkouts) => {
+    const response = await fetch(`${process.env.API_URL}/program-workout`,
+        {
+            method: "POST",
+            body: JSON.stringify(listOfNewWorkouts),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+export const updateWorkouts = async (listOfWorkouts) => {
+    const response = await fetch(`${process.env.API_URL}/program-workout/update`,
+        {
+            method: "PUT",
+            body: JSON.stringify(listOfWorkouts),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+export const removeWorkouts = async (workoutIds) => {
+    const response = await fetch(`${process.env.API_URL}/program-workout`,
+        {
+            method: "DELETE",
+            body: JSON.stringify(workoutIds),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
 export const getAccountingDataCount = async (table) => {
     const response = await fetch(`${process.env.API_URL}/table/${table}/count`,
         {

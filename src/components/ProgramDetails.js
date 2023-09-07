@@ -1,7 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {getProgramScheduleByProgramId, getWorkoutsByProgramId} from "../api"
-import {Button, Card, Header, Input} from "semantic-ui-react";
+import {Button, Card, Header, Icon, Input, Label} from "semantic-ui-react";
 import '../sidecar.css'; // custom CSS file
+import {ProgramContext, WorkoutContext} from '../programContext';
+import WorkoutComponent from "./WorkoutComponent";
 
 const FormattedProgramSchedule = ({data}) => {
     return (
@@ -14,157 +16,19 @@ const FormattedProgramSchedule = ({data}) => {
     );
 };
 
-const WorkoutComponent = ({isMobile, workoutData}) => {
-    const [isEdit, setIsEdit] = useState(false);
-    const [dayEdit, setDayEdit] = useState(0);
-    const [weekEdit, setWeekEdit] = useState(0);
-    const [movementsToEdit, setMovementsToEdit] = useState([]);
 
-    const EditWorkout = ({handleSubmit, day, initialMovements}) => {
-        const [movements, setMovements] = useState(initialMovements);
+const ProgramDetails = () => {
 
-        // Function to update a specific movement description
-        const updateMovement = (index, newDescription) => {
-            const newMovements = [...movements];
-            newMovements[index].movement_description = newDescription;
-            setMovements(newMovements);
-        };
+    // context from parent
+    const { currentProgram } = useContext(ProgramContext);
+    const { handleBackClick } = useContext(ProgramContext);
 
-        return (
-            <Card fluid>
-                <Card.Content>
-                    <Card.Header>Day {day}</Card.Header>
-                    <Card.Description>
-                        {initialMovements.map((movement, index) => (
-                            <div key={movement.id}>
-                                <Input fluid={true}
-                                    value={movement.movement_description}
-                                    onChange={(e) => updateMovement(index, e.target.value)}
-                                />
-                                <Input fluid={true}
-                                       value={movement.movement_notes}
-                                       onChange={(e) => updateMovement(index, e.target.value)}
-                                />
-                            </div>
-                        ))}
-                    </Card.Description>
-                </Card.Content>
-                <Card.Content extra>
-                    <div className='ui two buttons'>
-                        <Button basic color='green' onClick={() => handleSubmit(movements, true)}>
-                            Submit
-                        </Button>
-                        <Button basic color='red' onClick={() => handleSubmit(movements, false)}>
-                            Cancel
-                        </Button>
-                    </div>
-                </Card.Content>
-            </Card>
-        );
-    }
-
-    // Function to submit the updated movements to the API
-    const handleSetEdit = (week, day, movements) => {
-        console.log(movements)
-        setMovementsToEdit(movements)
-        setDayEdit(day)
-        setWeekEdit(week)
-        setIsEdit(true)
-    };
-
-    // Function to submit the updated movements to the API
-    const handleSubmit = (movementEditsToSubmit, submit) => {
-        console.log(movementEditsToSubmit)
-        console.log(submit)
-        setIsEdit(false)
-        setDayEdit(0)
-        setWeekEdit(0)
-        setMovementsToEdit([])
-    };
-
-    const WorkoutCard = ({week, day, movements}) => {
-        return (
-            <Card fluid color='blue'>
-                <Card.Content>
-                    <Card.Header>Day {day}</Card.Header>
-                    <Card.Description key={day}>
-                        {movements.map(movement => (
-                            <p key={movement.id}>{movement.movement_description}</p>
-                        ))
-                        }
-                    </Card.Description>
-                </Card.Content>
-                <Card.Content extra>
-                    <div>
-                        <Button primary onClick={() => handleSetEdit(week, day, movements)}>Edit</Button>
-                    </div>
-                </Card.Content>
-            </Card>
-        )
-    }
-
-    const WorkoutMovement = ({week, day, movements}) => {
-        // if isEdit && week == weekToEdit && day == dayToEdit
-        let showEditComponent = false;
-        if (isEdit && weekEdit == week && dayEdit == day) {
-            showEditComponent = true
-        }
-        return showEditComponent ? <EditWorkout handleSubmit={handleSubmit} day={day}
-                                                initialMovements={movementsToEdit}/> :
-            <WorkoutCard week={week} day={day} movements={movements}/>
-    }
-
-    const FormattedWorkout = ({isMobile, week, workoutDetails}) => {
-        let itemsPurRow = workoutDetails ? workoutDetails.length : undefined
-        if (isMobile) {
-            itemsPurRow = undefined
-        }
-        let weekAndDayMovements;
-        let showEditComponent = false;
-        if (isEdit && weekEdit == week) {
-            showEditComponent = true
-            weekAndDayMovements = workoutDetails.filter((dayMovements) => {
-                if(dayMovements.day == dayEdit) {
-                    return dayMovements
-                }
-            })
-            if(weekAndDayMovements.length > 0) {
-                weekAndDayMovements = weekAndDayMovements[0].movements
-            }
-        }
-        return (
-            <Card.Content>
-                <Card.Header className={"week-card"}>Week {week}</Card.Header>
-                {
-                    showEditComponent ? <EditWorkout handleSubmit={handleSubmit} day={dayEdit}
-                                                     initialMovements={weekAndDayMovements}/> :
-                        <Card.Group itemsPerRow={itemsPurRow}>
-                            {workoutDetails ? workoutDetails.map(item => (
-                                <WorkoutMovement week={week} day={item.day} movements={item.movements}/>
-                            )) : <Card.Description/>}
-                        </Card.Group>
-                }
-            </Card.Content>
-
-        );
-    };
-
-    return (
-        workoutData.map(item => (
-                <Card fluid color='red'>
-                    <FormattedWorkout isMobile={isMobile} week={item.week} workoutDetails={item.days}/>
-                </Card>
-            )
-        ))
-}
-
-const ProgramDetails = ({handleBackClick, currentProgram}) => {
-    // the key with this type of setup is that we need a line & f(x) for each input
     const [rawProgramDetails, setRawProgramDetails] = useState([]);
     const [formattedProgramDetails, setFormattedProgramDetails] = useState([]);
     const [rawWorkouts, setRawWorkouts] = useState([]);
     const [formattedWorkouts, setFormattedWorkouts] = useState([]);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [didEdit, setDidEdit] = useState(0);
 
     useEffect(() => {
         // Handler to call on window resize
@@ -189,6 +53,16 @@ const ProgramDetails = ({handleBackClick, currentProgram}) => {
     }, []);
 
     useEffect(() => {
+        if(didEdit === 1) {
+            getWorkoutsByProgramId(currentProgram['id'])
+                .then((response) => {
+                    setDidEdit(0)
+                    return setRawWorkouts(response)
+                })
+        }
+    }, [didEdit]);
+
+    useEffect(() => {
         const concatenatedString = rawProgramDetails.map(item => {
             const startDate = new Date(item.start_date);
             const endDate = new Date(item.end_date);
@@ -204,8 +78,10 @@ const ProgramDetails = ({handleBackClick, currentProgram}) => {
         const sortedWorkouts = rawWorkouts.slice().sort((a, b) => {
             if (a.week !== b.week) {
                 return a.week - b.week;
-            } else {
+            } else if (a.day !== b.day) {
                 return a.day - b.day;
+            } else {
+                return a.movement_order - b.movement_order;
             }
         })
 
@@ -257,12 +133,13 @@ const ProgramDetails = ({handleBackClick, currentProgram}) => {
                 </Card>
             </Card.Group>
             <Card.Group stackable={true}>
-                <WorkoutComponent workoutData={formattedWorkouts} isMobile={isMobile}/>
+                <WorkoutContext.Provider value={{ setDidEdit, setFormattedWorkouts }}>
+                    <WorkoutComponent workoutData={formattedWorkouts} isMobile={isMobile} didEdit={didEdit}/>
+                </WorkoutContext.Provider>
             </Card.Group>
             <Button primary onClick={handleBackClick}>Back</Button>
             <Button primary onClick={handleBackClick}>Repeat</Button>
             <Button primary onClick={handleBackClick}>Assign</Button>
-            <Button primary onClick={handleBackClick}>View Workout</Button>
         </div>
     )
 }

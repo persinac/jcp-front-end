@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {getPrograms} from "../api"
 import {Modal} from 'semantic-ui-react';
 import {Container} from "semantic-ui-react";
+import { ProgramContext } from '../programContext';
 import ProgramList from "./ProgramList";
 import ProgramDetails from "./ProgramDetails";
 
@@ -59,7 +60,10 @@ const Programs = () => {
                     <ProgramList handleShowProgramDetails={handleShowProgramDetails}
                                  programPageHandler={programPageHandler} programData={programData}
                                  activeProgramPage={activeProgramPage}/> :
-                    <ProgramDetails handleBackClick={handleBackClick} currentProgram={currentProgram}/>}
+                    <ProgramContext.Provider value={{ currentProgram, handleBackClick }}>
+                        <ProgramDetails />
+                    </ProgramContext.Provider>
+                }
             </div>
         </Container>
     )
