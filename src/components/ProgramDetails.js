@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
-import {getProgramScheduleByProgramId, getWorkoutsByProgramId} from "../api"
+import {getProgramScheduleByProgramId, getWorkoutsByProgramId, updateProgram} from "../api"
 import {Button, Card, Form, Header, Icon, Input, Label} from "semantic-ui-react";
 import '../sidecar.css'; // custom CSS file
 import {ProgramContext, WorkoutContext} from '../programContext';
@@ -16,40 +16,92 @@ const FormattedProgramSchedule = ({data}) => {
     );
 };
 
-const EditProgram = ({isMobile, currentProgram, handleProgramEdit, updateProgram}) => {
+const EditProgram = ({currentProgram, handleProgramEdit}) => {
+    const [programEdit, setProgramEdit] = useState(currentProgram);
+    const updateProgramValues = (value, attribute) => {
+        const program = {...programEdit};
+        program[attribute] = value;
+        setProgramEdit(program);
+    }
+
     return (
-        <Card.Group itemsPerRow={isMobile ? undefined : 2}>
             <Card fluid color='red'>
-                <Card.Header>Program</Card.Header>
                 <Card.Content>
+                    <Card.Header>Program</Card.Header>
                     <Card.Description>
                         <Form.Group widths='equal'>
                             <Form.Input fluid label='Name' placeholder='Phase 1 - Volume'
-                                        value={currentProgram.name}
-                                        onChange={(e) => updateProgram(e.target.value, "name")}
+                                        value={programEdit.name}
+                                        onChange={(e) => updateProgramValues(e.target.value, "name")}
+                            />
+                            <Form.Input fluid label='Type' placeholder='Intensity'
+                                        value={programEdit.type}
+                                        onChange={(e) => updateProgramValues(e.target.value, "type")}
                             />
                             <Form.Input fluid label='Description' placeholder='8 rep maxes for everyone'
-                                        value={currentProgram.description}
-                                        onChange={(e) => updateProgram(e.target.value, "description")}
+                                        value={programEdit.description}
+                                        onChange={(e) => updateProgramValues(e.target.value, "description")}
                             />
                         </Form.Group>
                     </Card.Description>
                 </Card.Content>
                 <Card.Content extra>
                     <div className='ui two buttons'>
-                        <Button basic color='green' onClick={() => handleProgramEdit(currentProgram)}>
+                        <Button basic color='green' onClick={() => handleProgramEdit(programEdit, true)}>
                             Submit
                         </Button>
-                        <Button basic color='red' onClick={() => handleProgramEdit(currentProgram)}>
+                        <Button basic color='red' onClick={() => handleProgramEdit(programEdit, false)}>
                             Cancel
                         </Button>
                     </div>
                 </Card.Content>
             </Card>
-            <Card fluid color='red'>
-                <FormattedProgramSchedule data={formattedProgramDetails}/>
-            </Card>
+    );
+};
+
+const ProgramDetailsHeader = ({
+                                  isMobile,
+                                  currentProgram,
+                                  handleProgramEdit,
+                                  formattedProgramDetails,
+                                  isProgramEdit
+                              }) => {
+    return (
+        <Card.Group itemsPerRow={isMobile ? undefined : 2}>
+            {
+                isProgramEdit ?
+                    <EditProgram currentProgram={currentProgram} handleProgramEdit={handleProgramEdit}/> :
+                    <ReadOnlyProgram currentProgram={currentProgram} handleProgramEdit={handleProgramEdit}/>
+            }
+            <ReadOnlyProgramSchedule formattedProgramDetails={formattedProgramDetails}/>
         </Card.Group>
+    );
+}
+
+const ReadOnlyProgram = ({currentProgram, handleProgramEdit}) => {
+    return (
+        <Card fluid color='red'>
+            <Card.Content>
+                <Card.Header>{currentProgram['name']}</Card.Header>
+                <Card.Description>{currentProgram['description']}</Card.Description>
+                <Card.Meta>{currentProgram['type']}</Card.Meta>
+            </Card.Content>
+            <Card.Content extra>
+                <div className='ui one buttons'>
+                    <Button basic color='green' onClick={() => handleProgramEdit()}>
+                        Edit
+                    </Button>
+                </div>
+            </Card.Content>
+        </Card>
+    )
+};
+
+const ReadOnlyProgramSchedule = ({formattedProgramDetails}) => {
+    return (
+        <Card fluid color='red'>
+            <FormattedProgramSchedule data={formattedProgramDetails}/>
+        </Card>
     );
 };
 
@@ -57,9 +109,9 @@ const EditProgram = ({isMobile, currentProgram, handleProgramEdit, updateProgram
 const ProgramDetails = () => {
 
     // context from parent
-    const { currentProgram } = useContext(ProgramContext);
-    const { setCurrentProgram } = useContext(ProgramContext);
-    const { handleBackClick } = useContext(ProgramContext);
+    const {currentProgram} = useContext(ProgramContext);
+    const {setCurrentProgram} = useContext(ProgramContext);
+    const {handleBackClick} = useContext(ProgramContext);
 
     const [rawProgramDetails, setRawProgramDetails] = useState([]);
     const [formattedProgramDetails, setFormattedProgramDetails] = useState([]);
@@ -68,6 +120,7 @@ const ProgramDetails = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [repeat, setRepeat] = useState(false);
     const [didEdit, setDidEdit] = useState(0);
+    const [isProgramEdit, setIsProgramEdit] = useState(false);
 
     useEffect(() => {
         // Handler to call on window resize
@@ -92,7 +145,7 @@ const ProgramDetails = () => {
     }, []);
 
     useEffect(() => {
-        if(didEdit === 1) {
+        if (didEdit === 1) {
             getWorkoutsByProgramId(currentProgram['id'])
                 .then((response) => {
                     setDidEdit(0)
@@ -162,27 +215,31 @@ const ProgramDetails = () => {
         setFormattedWorkouts(restructuredData)
     }, [rawProgramDetails, rawWorkouts])
 
-    const updateProgram = (value, attribute) => {
-        const program = [...currentProgram];
-        program[attribute] = value;
-        setCurrentProgram(program);
-    }
-
-    const handleProgramEdit = () => {
-
+    const handleProgramEdit = (program, submit) => {
+        if (isProgramEdit) {
+            if(submit) {
+                updateProgram(program)
+                    .then((results) => {
+                        console.log(results)
+                        setCurrentProgram(program)
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+                    .finally(() => setIsProgramEdit(false))
+            }
+        } else {
+            setIsProgramEdit(true)
+        }
     }
 
     return (
         <div className={"div-card-parent"}>
-            <Card.Group itemsPerRow={isMobile ? undefined : 2}>
-                <Card fluid color='red' header={currentProgram['name']} description={currentProgram['description']}
-                      meta={currentProgram['type']}/>
-                <Card fluid color='red'>
-                    <FormattedProgramSchedule data={formattedProgramDetails}/>
-                </Card>
-            </Card.Group>
+            <ProgramDetailsHeader formattedProgramDetails={formattedProgramDetails}
+                                  handleProgramEdit={handleProgramEdit} currentProgram={currentProgram}
+                                  isMobile={isMobile} isProgramEdit={isProgramEdit}/>
             <Card.Group stackable={true}>
-                <WorkoutContext.Provider value={{ setDidEdit, setFormattedWorkouts }}>
+                <WorkoutContext.Provider value={{setDidEdit, setFormattedWorkouts}}>
                     <WorkoutComponent workoutData={formattedWorkouts} isMobile={isMobile} didEdit={didEdit}/>
                 </WorkoutContext.Provider>
             </Card.Group>

@@ -16,6 +16,22 @@ export const postProgramAndSchedule = async (programName, programType, programDe
     return await response.json()
 }
 
+export const updateProgram = async (program) => {
+    const response = await fetch(`${process.env.API_URL}/program/${program.id}`,
+        {
+            method: "PUT",
+            body: JSON.stringify({
+                "name": program.name,
+                "type": program.type,
+                "description": program.description
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+    return await response.json()
+}
+
 export const getProgramCount = async () => {
     const response = await fetch(`${process.env.API_URL}/program/count`,
         {
@@ -55,6 +71,9 @@ export const getProgramScheduleByProgramId = async (programId, currentPage, sort
     return await response.json()
 }
 
+/***
+ WORKOUTS
+ ***/
 export const getWorkoutsByProgramId = async (programId) => {
     const response = await fetch(`${process.env.API_URL}/program-workout/program/${programId}?pageSize=1000`,
         {
