@@ -2,7 +2,7 @@ import './App.css';
 import 'semantic-ui-css/semantic.min.css'
 import React, { useState }from "react";
 import IncrementDecrementComponent from "./components/IncrementDecrement";
-import UserInput from "./components/UserInput";
+import ProgramCreateNew from "./components/ProgramCreateNew";
 import Home from "./components/Home";
 import NavigationBar from "./components/Navbar";
 import {

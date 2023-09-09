@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {getPrograms} from "../api"
-import {Modal} from 'semantic-ui-react';
+import {Button, Modal} from 'semantic-ui-react';
 import {Container} from "semantic-ui-react";
 import { ProgramContext } from '../programContext';
 import ProgramList from "./ProgramList";
@@ -31,11 +31,14 @@ const Programs = () => {
     const [currentProgram, setCurrentProgram] = useState(null);
     const [showProgramDetails, setShowProgramDetails] = useState(false);
     const [activeProgramPage, setActiveProgramPage] = useState(1);
+    const [isCreateProgram, setIsCreateProgram] = useState(false);
 
     useEffect(() => {
-        getPrograms(1, "DESC")
-            .then(response => setProgramData(response))
-    }, []);
+        if(!isCreateProgram) {
+            getPrograms(1, "DESC")
+                .then(response => setProgramData(response))
+        }
+    }, [isCreateProgram]);
 
     const handleShowProgramDetails = (currentProgram) => {
         setShowProgramDetails(true);
@@ -59,7 +62,10 @@ const Programs = () => {
                 {!showProgramDetails ?
                     <ProgramList handleShowProgramDetails={handleShowProgramDetails}
                                  programPageHandler={programPageHandler} programData={programData}
-                                 activeProgramPage={activeProgramPage}/> :
+                                 activeProgramPage={activeProgramPage}
+                                 isCreateProgram={isCreateProgram}
+                                 setIsCreateProgram={setIsCreateProgram}
+                    /> :
                     <ProgramContext.Provider value={{ currentProgram, handleBackClick, setCurrentProgram }}>
                         <ProgramDetails />
                     </ProgramContext.Provider>

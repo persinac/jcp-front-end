@@ -1,18 +1,30 @@
 import React, {useEffect, useState} from "react";
-import {getProgramCount, getPrograms} from "../api"
-import { Pagination } from 'semantic-ui-react';
+import {createProgram, createProgramSchedule, getProgramCount, getPrograms} from "../api"
+import {Button, Pagination} from 'semantic-ui-react';
 import {Table} from "semantic-ui-react";
+import ProgramCreateNew from "./ProgramCreateNew";
 
 
-const ProgramList = ({handleShowProgramDetails, programPageHandler, programData, activeProgramPage}) => {
+const ProgramList = ({handleShowProgramDetails, programPageHandler, programData, activeProgramPage, isCreateProgram, setIsCreateProgram}) => {
     const [programDataCount, setProgramDataCount] = useState(0);
 
     useEffect(() => {
         getProgramCount('programs')
             .then(response => setProgramDataCount(response[0]['total_count']))
-        getPrograms(1, "DESC")
-            .then(response => setProgramData(response))
     }, []);
+
+    const handleNewProgramSubmit = async (data, submit) => {
+        if(submit) {
+            const {program, programSchedule} = {...data}
+            const newProgramResponse = await createProgram(program)
+            console.log(newProgramResponse)
+            programSchedule.program_id = newProgramResponse.id
+            const newProgramScheduleResponse = await createProgramSchedule(programSchedule)
+            console.log(newProgramScheduleResponse)
+
+        }
+        setIsCreateProgram(false)
+    }
 
     const programDataColumns = () => {
         return [
@@ -122,17 +134,24 @@ const ProgramList = ({handleShowProgramDetails, programPageHandler, programData,
 
     return (
         <div>
-            <div>
-                <TableItUp table={"programs"} data={programData}/>
-            </div>
-            <div className="ui right aligned container">
-                <Pagination
-                    activePage={activeProgramPage}
-                    onPageChange={programPageHandler}
-                    totalPages={Math.ceil(programDataCount/10)}
-                    ellipsisItem={null}
-                />
-            </div>
+            {isCreateProgram ? <ProgramCreateNew handleNewProgramSubmit={handleNewProgramSubmit}/> :
+                <div className="ui container">
+                    <div>
+                        <TableItUp table={"programs"} data={programData}/>
+                    </div>
+                    <div className="ui right floated pagination menu">
+                        <Pagination
+                            activePage={activeProgramPage}
+                            onPageChange={programPageHandler}
+                            totalPages={Math.ceil(programDataCount / 10)}
+                            ellipsisItem={null}
+                        />
+                    </div>
+                    <div className="ui left floated">
+                        <Button primary onClick={() => setIsCreateProgram(true)}>Create New Program</Button>
+                    </div>
+                </div>
+            }
         </div>
     )
 }

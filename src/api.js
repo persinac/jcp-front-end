@@ -1,21 +1,18 @@
-export const postProgramAndSchedule = async (programName, programType, programDescription, programScheduleStartDate, programScheduleEndDate) => {
-    const response = await fetch(`${process.env.API_URL}/bot/register`,
-        {
-            method: "POST",
-            body: JSON.stringify({
-                "programName": programName,
-                "programType": programType,
-                "programDescription": programDescription,
-                "programScheduleStartDate": programScheduleStartDate,
-                "programScheduleEndDate": programScheduleEndDate
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-    return await response.json()
+
+const formatTimestamp = (dateToFormat) => {
+    const copyDate = new Date(dateToFormat);
+    const year = copyDate.getFullYear();
+    const month = String(copyDate.getMonth() + 1).padStart(2, '0');
+
+    // Ensure day is a two-digit number
+    const day = String(copyDate.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
 }
 
+/***
+ PROGRAMS
+ ***/
 export const updateProgram = async (program) => {
     const response = await fetch(`${process.env.API_URL}/program/${program.id}`,
         {
@@ -25,6 +22,18 @@ export const updateProgram = async (program) => {
                 "type": program.type,
                 "description": program.description
             }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+    return await response.json()
+}
+
+export const createProgram = async (program) => {
+    const response = await fetch(`${process.env.API_URL}/program`,
+        {
+            method: "POST",
+            body: JSON.stringify(program),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -68,6 +77,77 @@ export const getProgramScheduleByProgramId = async (programId, currentPage, sort
             method: "GET",
             headers: {}
         })
+    return await response.json()
+}
+
+export const updateProgramSchedule = async (programSchedule) => {
+    programSchedule.start_date = formatTimestamp(programSchedule.start_date)
+    programSchedule.end_date = formatTimestamp(programSchedule.end_date)
+    const response = await fetch(`${process.env.API_URL}/program-schedule/${programSchedule.id}`,
+        {
+            method: "PUT",
+            body: JSON.stringify(programSchedule),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+export const createProgramSchedule = async (programSchedule) => {
+    programSchedule.start_date = formatTimestamp(programSchedule.start_date)
+    programSchedule.end_date = formatTimestamp(programSchedule.end_date)
+    const response = await fetch(`${process.env.API_URL}/program-schedule`,
+        {
+            method: "POST",
+            body: JSON.stringify(programSchedule),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+/***
+ PROGRAM ASSIGNMENT
+ ***/
+export const getProgramAssignmentForAssignment = async (programScheduleId) => {
+    const response = await fetch(`${process.env.API_URL}/program-assignment/program-schedule/assign/${programScheduleId}?pageSize=1000`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const createProgramAssignments = async (newProgramAssignments) => {
+    const response = await fetch(`${process.env.API_URL}/program-assignment`,
+        {
+            method: "POST",
+            body: JSON.stringify(newProgramAssignments),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+export const updateProgramAssignments = async (modifiedProgramAssignments) => {
+    const response = await fetch(`${process.env.API_URL}/program-assignment`,
+        {
+            method: "PUT",
+            body: JSON.stringify(modifiedProgramAssignments),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+export const deleteProgramAssignments = async (programAssignmentIds) => {
+    const response = await fetch(`${process.env.API_URL}/program-assignment`,
+        {
+            method: "DELETE",
+            body: JSON.stringify(programAssignmentIds),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
     return await response.json()
 }
 
