@@ -1,15 +1,17 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
-    createProgramAssignments, deleteProgramAssignments,
-    getProgramAssignmentForAssignment,
-    getProgramScheduleByProgramId,
-    getWorkoutsByProgramId,
-    updateProgram, updateProgramAssignments, updateProgramSchedule
+    getProgramAssignmentForAssignment, getProgramScheduleByProgramId,
 } from "../api"
-import {Button, Card, Divider, Dropdown, Form, Header, Icon, Input, Label, List, Segment} from "semantic-ui-react";
-import '../sidecar.css'; // custom CSS file
+import {
+    Button,
+    Card,
+    Dropdown, Form, Input,
+    Modal, TextArea
+} from "semantic-ui-react";
 import SemanticDatepicker from 'react-semantic-ui-datepickers';
 import {EditProgramAssignment} from "./ProgramAssignment";
+import 'semantic-ui-css/semantic.min.css';
+import "../sidecar.css"
 
 const formatTimestamp = (dateToFormat) => {
     const copyDate = new Date(dateToFormat);
@@ -33,6 +35,44 @@ const formatTimestampForDatePicker = (dateToFormat) => {
     return `${year}-${month}-${day} 00:00:00`;
 }
 
+const CustomModal = ({isModalOpen, handleShowModal, programId, handleCreateProgramSchedule}) => {
+    const [newProgramSchedule, setNewProgramSchedule] = useState({program_id: programId, start_date: new Date(), end_date: new Date()});
+    const programScheduleInputHandler = (e, {value, attribute}) => {
+        const copyProgramSchedule = {...newProgramSchedule}
+        copyProgramSchedule[attribute] = value
+        setNewProgramSchedule(copyProgramSchedule);
+    };
+
+    return (
+        <Modal
+            className="centered-modal-override"
+            open={isModalOpen}
+            onClose={() => handleShowModal(false)}
+        >
+            <Modal.Header>Create New Schedule</Modal.Header>
+            <Modal.Content>
+                <Form>
+                    <Form.Group style={{ display: "flex" }}>
+                        <Form.Field style={{ flexGrow: "1" }}>
+                            <SemanticDatepicker  placeholder='Start Date' inline={true} value={newProgramSchedule.start_date} onChange={programScheduleInputHandler} attribute={"start_date"}/>
+                        </Form.Field>
+                        <Form.Field style={{ flexGrow: "1" }}>
+                            <SemanticDatepicker  placeholder='End Date' inline={true} value={newProgramSchedule.end_date} onChange={programScheduleInputHandler} attribute={"end_date"}/>
+                        </Form.Field>
+                    </Form.Group>
+                </Form>
+            </Modal.Content>
+            <Modal.Actions>
+                <Button negative onClick={() => handleShowModal(false)}>Cancel</Button>
+                <Button positive onClick={() => {
+                    handleCreateProgramSchedule(newProgramSchedule, true)
+                    handleShowModal(false);
+                }}>Save</Button>
+            </Modal.Actions>
+        </Modal>
+    );
+};
+
 export const ReadOnlyProgramSchedule = ({programSchedule, handleProgramScheduleEdit}) => {
     return (
         <Card fluid color='red'>
@@ -55,11 +95,12 @@ export const ReadOnlyProgramSchedule = ({programSchedule, handleProgramScheduleE
     );
 };
 
-export const EditProgramSchedule = ({programScheduleDropdownValues, handleProgramScheduleEdit, programScheduleList}) => {
+export const EditProgramSchedule = ({programScheduleDropdownValues, handleProgramScheduleEdit, programScheduleList, handleCreateProgramSchedule, currentProgram}) => {
     const [selectedScheduleId, setSelectedScheduleId] = useState();
     const [selectedSchedule, setSelectedSchedule] = useState();
     const [programScheduleAssignment, setProgramScheduleAssignment] = useState([]);
     const [originalProgramScheduleAssignment, setOriginalProgramScheduleAssignment] = useState([]);
+    const [modalOpen, setModalOpen] = useState(false);
 
     const handleProgramSelection = (event, {value}) => {
         setSelectedScheduleId(value)
@@ -84,6 +125,8 @@ export const EditProgramSchedule = ({programScheduleDropdownValues, handleProgra
                     value={selectedScheduleId}
                     onChange={handleProgramSelection}
                 />
+                <Button secondary onClick={() => setModalOpen(true)}>Add New Schedule</Button>
+                <CustomModal isModalOpen={modalOpen} handleShowModal={setModalOpen} programId={currentProgram['id']} handleCreateProgramSchedule={handleCreateProgramSchedule} />
             </Card.Content>
             <EditProgramScheduleDates selectedSchedule={selectedSchedule} setSelectedSchedule={setSelectedSchedule}/>
             <EditProgramAssignment initialAssignment={programScheduleAssignment} originalAssignment={originalProgramScheduleAssignment}/>

@@ -28,13 +28,6 @@ const ProgramCreateNew = ({handleNewProgramSubmit}) => {
         setNewProgramSchedule(copyProgramSchedule);
     };
 
-    /***
-     * Flow:
-     *  - Create Program (or select existing one)
-     *  - Create the program schedule (start date and end date)
-     *  - Add movements and such
-     *  - Assign users to the program
-     */
     return (
         <div>
             <div className="d-flex flex-row justify-content-center">

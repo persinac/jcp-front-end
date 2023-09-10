@@ -1,29 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {getPrograms} from "../api"
-import {Button, Modal} from 'semantic-ui-react';
 import {Container} from "semantic-ui-react";
 import { ProgramContext } from '../programContext';
 import ProgramList from "./ProgramList";
 import ProgramDetails from "./ProgramDetails";
-
-const CustomModal = ({modalOpen, closeModal, data}) => {
-    return (
-        <Modal
-            open={modalOpen}
-            onClose={closeModal}
-            size="small"
-            closeIcon
-            closeOnEscape
-            closeOnDimmerClick
-        >
-            <Modal.Header>Centered Modal</Modal.Header>
-            <Modal.Content>
-                <p>Data: </p>
-                <pre>{JSON.stringify(data, null, 2)}</pre>
-            </Modal.Content>
-        </Modal>
-    );
-};
 
 const Programs = () => {
     // the key with this type of setup is that we need a line & f(x) for each input

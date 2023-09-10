@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Button, Card, Form} from "semantic-ui-react";
 import {
-    createProgramAssignments, deleteProgramAssignments,
+    createProgramAssignments, createProgramSchedule, deleteProgramAssignments,
     getProgramScheduleByProgramId,
     updateProgramAssignments,
     updateProgramSchedule
@@ -63,11 +63,11 @@ export const EditProgramHeader = ({currentProgram, handleProgramEdit}) => {
 };
 
 export const ProgramDetailsHeader = ({
-                                  isMobile,
-                                  currentProgram,
-                                  handleProgramEdit,
-                                  isProgramEdit
-                              }) => {
+                                         isMobile,
+                                         currentProgram,
+                                         handleProgramEdit,
+                                         isProgramEdit
+                                     }) => {
     const [programSchedule, setProgramSchedule] = useState([]);
     const [isProgramScheduleEdit, setIsProgramScheduleEdit] = useState(false);
     const [programScheduleDropdown, setProgramScheduleDropdown] = useState(false);
@@ -79,7 +79,7 @@ export const ProgramDetailsHeader = ({
 
     const handleProgramScheduleEdit = async (modifiedProgramSchedule, modifiedAssignments, originalAssignments, submit) => {
         if (isProgramScheduleEdit) {
-            if(submit) {
+            if (submit) {
                 const modProgramScheduleResult = await updateProgramSchedule(modifiedProgramSchedule)
                 const programScheduleListCopy = [...programSchedule]
                 const foundIdx = programScheduleListCopy.findIndex(schedule => schedule.id === modifiedProgramSchedule.id)
@@ -89,8 +89,8 @@ export const ProgramDetailsHeader = ({
                 //get the diff
                 const diffList = modifiedAssignments.filter(modAssignment => {
                     const ogAssignment = originalAssignments.filter(ogAss => ogAss.user_id === modAssignment.user_id && ogAss.program_schedule_id === modAssignment.program_schedule_id)
-                    if(ogAssignment) {
-                        if(ogAssignment[0].assigned_to_program !== modAssignment.assigned_to_program) {
+                    if (ogAssignment) {
+                        if (ogAssignment[0].assigned_to_program !== modAssignment.assigned_to_program) {
                             return modAssignment
                         }
                     }
@@ -99,7 +99,7 @@ export const ProgramDetailsHeader = ({
 
                 // inserts => where program_schedule_id is null AND is_assigned = 1
                 let inserts = diffList.filter(modAssignment => {
-                    if(modAssignment.program_schedule_id === null && modAssignment.assigned_to_program === 1) {
+                    if (modAssignment.program_schedule_id === null && modAssignment.assigned_to_program === 1) {
                         return modAssignment
                     }
                 })
@@ -113,7 +113,7 @@ export const ProgramDetailsHeader = ({
 
                 // updates => where program_schedule_id is NOT null AND is_assigned = 1
                 let updates = diffList.filter(modAssignment => {
-                    if(modAssignment.program_schedule_id !== null && modAssignment.assigned_to_program === 1) {
+                    if (modAssignment.program_schedule_id !== null && modAssignment.assigned_to_program === 1) {
                         return modAssignment
                     }
                 })
@@ -129,18 +129,18 @@ export const ProgramDetailsHeader = ({
 
                 // "deletes" => where program_schedule_id is NOT null AND is_assigned = 0
                 const deletes = diffList.filter(modAssignment => {
-                    if(modAssignment.program_schedule_id !== null && modAssignment.assigned_to_program === 0) {
+                    if (modAssignment.program_schedule_id !== null && modAssignment.assigned_to_program === 0) {
                         return modAssignment
                     }
                 })
 
-                if(inserts.length > 0) {
+                if (inserts.length > 0) {
                     await createProgramAssignments(inserts)
                 }
-                if(updates.length > 0) {
+                if (updates.length > 0) {
                     await updateProgramAssignments(updates)
                 }
-                if(deletes.length > 0) {
+                if (deletes.length > 0) {
                     await deleteProgramAssignments(deletes.map(ass => ass.program_schedule_id))
                 }
 
@@ -161,6 +161,24 @@ export const ProgramDetailsHeader = ({
         }
     }
 
+    const handleCreateProgramSchedule = async (newProgramSchedule, submit) => {
+        if (isProgramScheduleEdit) {
+            if (submit) {
+                const modProgramScheduleResult = await createProgramSchedule(newProgramSchedule)
+                const programSchedules = await getProgramScheduleByProgramId(currentProgram['id'])
+                setProgramSchedule(programSchedules)
+                const dropdownValues = programSchedules.map(item => {
+                    return {
+                        key: item.id,
+                        text: `${formatTimestamp(item.start_date)} - ${formatTimestamp(item.end_date)}`,
+                        value: item.id
+                    }
+                })
+                setProgramScheduleDropdown(dropdownValues)
+            }
+        }
+    }
+
     return (
         <Card.Group itemsPerRow={isMobile ? undefined : 2}>
             {
@@ -170,8 +188,14 @@ export const ProgramDetailsHeader = ({
             }
             {
                 isProgramScheduleEdit ?
-                    <EditProgramSchedule handleProgramScheduleEdit={handleProgramScheduleEdit} programScheduleDropdownValues={programScheduleDropdown} programScheduleList={programSchedule}/> :
-                    <ReadOnlyProgramSchedule programSchedule={programSchedule} handleProgramScheduleEdit={handleProgramScheduleEdit}/>
+                    <EditProgramSchedule handleCreateProgramSchedule={handleCreateProgramSchedule}
+                                         handleProgramScheduleEdit={handleProgramScheduleEdit}
+                                         programScheduleDropdownValues={programScheduleDropdown}
+                                         programScheduleList={programSchedule}
+                                         currentProgram={currentProgram}
+                    /> :
+                    <ReadOnlyProgramSchedule programSchedule={programSchedule}
+                                             handleProgramScheduleEdit={handleProgramScheduleEdit}/>
             }
         </Card.Group>
     );
