@@ -102,15 +102,26 @@ export const EditProgramSchedule = ({programScheduleDropdownValues, handleProgra
     const [originalProgramScheduleAssignment, setOriginalProgramScheduleAssignment] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
 
+    useEffect(() => {
+        if(programScheduleDropdownValues.length > 0) {
+            setSelectedScheduleId(programScheduleDropdownValues[0].value)
+        }
+    }, [programScheduleDropdownValues]);
+
+    useEffect(() => {
+        if(selectedScheduleId) {
+            getProgramAssignmentForAssignment(selectedScheduleId)
+                .then((results) => {
+                    setProgramScheduleAssignment(results)
+                    const deepCopy = JSON.parse(JSON.stringify(results));
+                    setOriginalProgramScheduleAssignment(deepCopy)
+                })
+            setSelectedSchedule(programScheduleList.filter(schedule => schedule.id === selectedScheduleId)[0])
+        }
+    }, [selectedScheduleId]);
+
     const handleProgramSelection = (event, {value}) => {
         setSelectedScheduleId(value)
-        getProgramAssignmentForAssignment(value)
-            .then((results) => {
-                setProgramScheduleAssignment(results)
-                const deepCopy = JSON.parse(JSON.stringify(results));
-                setOriginalProgramScheduleAssignment(deepCopy)
-            })
-        setSelectedSchedule(programScheduleList.filter(schedule => schedule.id === value)[0])
     }
 
     return (

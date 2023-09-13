@@ -105,7 +105,6 @@ const ProgramDetails = () => {
             if(submit) {
                 updateProgram(program)
                     .then((results) => {
-                        console.log(results)
                         setCurrentProgram(program)
                     })
                     .catch((err) => {

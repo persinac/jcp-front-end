@@ -42,7 +42,6 @@ const Athletes = () => {
     };
 
     const programPageHandler = (e, pageInfo) => {
-        console.log(pageInfo)
         setActivePage(pageInfo.activePage)
         getAthletes(pageInfo.activePage, "DESC")
             .then(response => setAthleteData(response))
