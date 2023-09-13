@@ -1,13 +1,9 @@
 import React, {useContext, useEffect, useState} from "react";
 import {
-    createProgramAssignments, deleteProgramAssignments,
-    getProgramAssignmentForAssignment,
-    getProgramScheduleByProgramId,
     getWorkoutsByProgramId,
-    updateProgram, updateProgramAssignments, updateProgramSchedule
+    updateProgram
 } from "../api"
-import {Button, Card, Divider, Dropdown, Form, Header, Icon, Input, Label, List, Segment} from "semantic-ui-react";
-import '../sidecar.css'; // custom CSS file
+import {Button, Card} from "semantic-ui-react";
 import {ProgramContext, WorkoutContext} from '../programContext';
 import WorkoutComponent from "./WorkoutComponent";
 import {ProgramDetailsHeader} from "./ProgramDetailsHeader";

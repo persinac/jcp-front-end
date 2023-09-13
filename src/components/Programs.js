@@ -27,7 +27,7 @@ const Programs = () => {
 
     const programPageHandler = (e, pageInfo) => {
         setActiveProgramPage(pageInfo.activePage)
-        getPrograms(activeProgramPage, "DESC")
+        getPrograms(pageInfo.activePage, "DESC")
             .then(response => setProgramData(response))
     };
 

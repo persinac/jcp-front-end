@@ -10,9 +10,29 @@ const formatTimestamp = (dateToFormat) => {
     return `${year}-${month}-${day}`;
 }
 
-/***
+/****************
  PROGRAMS
- ***/
+ ****************/
+export const getProgramCount = async () => {
+    const response = await fetch(`${process.env.API_URL}/program/count`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const getPrograms = async (currentPage, sortBy) => {
+    const pageSize = 10;
+    const sortByIDAscDesc = sortBy || "DESC";
+    const response = await fetch(`${process.env.API_URL}/program?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortByIDAscDesc}`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
 export const updateProgram = async (program) => {
     const response = await fetch(`${process.env.API_URL}/program/${program.id}`,
         {
@@ -41,25 +61,9 @@ export const createProgram = async (program) => {
     return await response.json()
 }
 
-export const getProgramCount = async () => {
-    const response = await fetch(`${process.env.API_URL}/program/count`,
-        {
-            method: "GET",
-            headers: {}
-        })
-    return await response.json()
-}
-
-export const getPrograms = async (currentPage, sortBy) => {
-    const pageSize = 10;
-    const response = await fetch(`${process.env.API_URL}/program?page=${currentPage}&pageSize=${pageSize}`,
-        {
-            method: "GET",
-            headers: {}
-        })
-    return await response.json()
-}
-
+/*********************
+ PROGRAM SCHEDULE
+ *********************/
 export const getAllProgramSchedule = async (currentPage, sortBy) => {
     const pageSize = 10;
     const response = await fetch(`${process.env.API_URL}/program-schedule?page=${currentPage}&pageSize=${pageSize}`,
@@ -106,9 +110,9 @@ export const createProgramSchedule = async (programSchedule) => {
     return await response.json()
 }
 
-/***
+/*******************************
  PROGRAM ASSIGNMENT
- ***/
+ *******************************/
 export const getProgramAssignmentForAssignment = async (programScheduleId) => {
     const response = await fetch(`${process.env.API_URL}/program-assignment/program-schedule/assign/${programScheduleId}?pageSize=1000`,
         {
@@ -151,9 +155,9 @@ export const deleteProgramAssignments = async (programAssignmentIds) => {
     return await response.json()
 }
 
-/***
+/*******************************
  WORKOUTS
- ***/
+ ********************************/
 export const getWorkoutsByProgramId = async (programId) => {
     const response = await fetch(`${process.env.API_URL}/program-workout/program/${programId}?pageSize=1000`,
         {
@@ -193,6 +197,73 @@ export const removeWorkouts = async (workoutIds) => {
             headers: {
                 'Content-Type': 'application/json'
             }})
+    return await response.json()
+}
+
+/*******************************
+ ATHLETES
+ *******************************/
+
+export const getAthleteCount = async () => {
+    const response = await fetch(`${process.env.API_URL}/athlete/count`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const getAthletes = async (currentPage, sortBy) => {
+    const pageSize = 10;
+    const sortByNameAscDesc = sortBy || "ASC";
+    const response = await fetch(`${process.env.API_URL}/athlete?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortByNameAscDesc}`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const getAthleteById = async (athleteId) => {
+    const response = await fetch(`${process.env.API_URL}/athlete/${athleteId}`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const createNewAthlete = async (listOfNewAthletes) => {
+    const response = await fetch(`${process.env.API_URL}/athlete/create`,
+        {
+            method: "POST",
+            body: JSON.stringify(listOfNewAthletes),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+export const updateAthlete = async (listOfAthletes) => {
+    const response = await fetch(`${process.env.API_URL}/athlete/update`,
+        {
+            method: "PUT",
+            body: JSON.stringify(listOfAthletes),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+export const removeAthletes = async (athleteIds) => {
+    const response = await fetch(`${process.env.API_URL}/athlete/remove`,
+        {
+            method: "DELETE",
+            body: JSON.stringify(workoutIds),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
     return await response.json()
 }
 
