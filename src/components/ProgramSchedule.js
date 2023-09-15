@@ -17,8 +17,6 @@ const formatTimestamp = (dateToFormat) => {
     const copyDate = new Date(dateToFormat);
     const year = copyDate.getFullYear();
     const month = String(copyDate.getMonth() + 1).padStart(2, '0');
-
-    // Ensure day is a two-digit number
     const day = String(copyDate.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
@@ -28,8 +26,6 @@ const formatTimestampForDatePicker = (dateToFormat) => {
     const copyDate = new Date(dateToFormat);
     const year = copyDate.getFullYear();
     const month = String(copyDate.getMonth() + 1).padStart(2, '0');
-
-    // Ensure day is a two-digit number
     const day = String(copyDate.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day} 00:00:00`;

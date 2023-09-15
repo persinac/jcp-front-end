@@ -3,7 +3,7 @@ import {
     getWorkoutsByProgramId,
     updateProgram
 } from "../api"
-import {Button, Card} from "semantic-ui-react";
+import {Button, Card, Tab} from "semantic-ui-react";
 import {ProgramContext, WorkoutContext} from '../programContext';
 import WorkoutComponent from "./WorkoutComponent";
 import {ProgramDetailsHeader} from "./ProgramDetailsHeader";
@@ -21,6 +21,7 @@ const ProgramDetails = () => {
     const [repeat, setRepeat] = useState(false);
     const [didEdit, setDidEdit] = useState(0);
     const [isProgramEdit, setIsProgramEdit] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(0); // default to the first tab
 
     useEffect(() => {
         // Handler to call on window resize
@@ -100,6 +101,10 @@ const ProgramDetails = () => {
         setFormattedWorkouts(restructuredData)
     }, [rawWorkouts])
 
+    const handleTabChange = (e, { activeIndex }) => {
+        setActiveIndex(activeIndex);
+    };
+
     const handleProgramEdit = (program, submit) => {
         if (isProgramEdit) {
             if(submit) {
@@ -119,21 +124,36 @@ const ProgramDetails = () => {
         }
     }
 
+    const panes = [
+        {
+            menuItem: 'Program',
+            render: () => <Tab.Pane attached={false}>
+                <ProgramDetailsHeader handleProgramEdit={handleProgramEdit} currentProgram={currentProgram}
+                                      isMobile={isMobile} isProgramEdit={isProgramEdit}/>
+            </Tab.Pane>,
+        },
+        {
+            menuItem: 'Workouts',
+            render: () => <Tab.Pane attached={false}>
+                <Card.Group stackable={true}>
+                    <WorkoutContext.Provider value={{setDidEdit, setFormattedWorkouts}}>
+                        <WorkoutComponent workoutData={formattedWorkouts} isMobile={isMobile} didEdit={didEdit}/>
+                    </WorkoutContext.Provider>
+                </Card.Group>
+            </Tab.Pane>,
+        }
+    ]
+
+    const TabExampleSecondaryPointing = ({activeIndex, handleTabChange}) => {
+        return <Tab menu={{ secondary: true, pointing: true }} panes={panes} activeIndex={activeIndex} onTabChange={handleTabChange} />
+    }
+
+
     return (
         <div className={"div-card-parent"}>
-            <ProgramDetailsHeader handleProgramEdit={handleProgramEdit} currentProgram={currentProgram}
-                                  isMobile={isMobile} isProgramEdit={isProgramEdit}/>
-            <Card.Group stackable={true}>
-                <WorkoutContext.Provider value={{setDidEdit, setFormattedWorkouts}}>
-                    <WorkoutComponent workoutData={formattedWorkouts} isMobile={isMobile} didEdit={didEdit}/>
-                </WorkoutContext.Provider>
-            </Card.Group>
-            <Button primary onClick={handleBackClick}>Back</Button>
-            <Button primary onClick={handleBackClick}>Repeat</Button>
-            <Button primary onClick={handleBackClick}>Assign</Button>
+            <TabExampleSecondaryPointing activeIndex={activeIndex} handleTabChange={handleTabChange}/>
         </div>
     )
 }
-
 
 export default ProgramDetails;
