@@ -7,6 +7,7 @@ import {
     updateProgramSchedule
 } from "../api";
 import {EditProgramSchedule, ReadOnlyProgramSchedule} from "./ProgramSchedule";
+import ProgramDelivery from "./ProgramDelivery";
 
 const formatTimestamp = (dateToFormat) => {
     const copyDate = new Date(dateToFormat);
@@ -180,7 +181,8 @@ export const ProgramDetailsHeader = ({
     }
 
     return (
-        <Card.Group itemsPerRow={isMobile ? undefined : 2}>
+        <div>
+            <Card.Group itemsPerRow={isMobile ? undefined : 2}>
             {
                 isProgramEdit ?
                     <EditProgramHeader currentProgram={currentProgram} handleProgramEdit={handleProgramEdit}/> :
@@ -197,7 +199,12 @@ export const ProgramDetailsHeader = ({
                     <ReadOnlyProgramSchedule programSchedule={programSchedule}
                                              handleProgramScheduleEdit={handleProgramScheduleEdit}/>
             }
+
         </Card.Group>
+        <Card.Group>
+            <ProgramDelivery isMobile={isMobile}/>
+        </Card.Group>
+        </div>
     );
 }
 
