@@ -9,3 +9,10 @@ export const ProgramContext = createContext(undefined);
 export const WorkoutContext = createContext(undefined);
 export const ProgramScheduleContext = createContext(undefined);
 export const ProgramScheduleAssignmentContext = createContext(undefined);
+export const ProgramDeliveryContext = createContext({
+    isProgramDeliveryEdit: false,
+    setIsProgramDeliveryEdit: () => {}, // default function
+    programDelivery: {},
+    programDeliveryDiscord: [],
+    programDeliveryEmail: []
+});

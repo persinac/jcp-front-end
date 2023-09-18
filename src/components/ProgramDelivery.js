@@ -1,20 +1,15 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useMemo, useState} from "react";
 import {
     Button,
     Card,
     Checkbox,
-    Grid,
     Icon,
-    Input,
-    Tab,
-    Form,
-    List,
     Table,
     Divider,
-    Select,
-    Dropdown
+    Dropdown, Input
 } from "semantic-ui-react";
-import {ProgramContext} from '../programContext';
+import {ProgramContext, ProgramDeliveryContext} from '../programContext';
+import ReadEditInput from "./General/ReadEditInput";
 
 const IProgramDelivery = {
     id: null,
@@ -41,37 +36,34 @@ const IProgramDeliveryEmail = {
     is_active: true
 }
 
+
 const ProgramDelivery = ({isMobile}) => {
 
     // context from parent
     const {currentProgram} = useContext(ProgramContext);
+    const {programDelivery, setProgramDelivery} = useContext(ProgramDeliveryContext);
+    const {programDeliveryEmail, setProgramDeliveryEmail} = useContext(ProgramDeliveryContext);
 
-    const [programDelivery, setProgramDelivery] = useState(IProgramDelivery);
-    const [programDeliveryDiscord, setProgramDeliveryDiscord] = useState([]);
-    const [programDeliveryEmail, setProgramDeliveryEmail] = useState([]);
     const [isProgramDeliveryEdit, setIsProgramDeliveryEdit] = useState(false);
+    const [deliveryConfigDiscord, setDeliveryConfigDiscord] = useState([]);
 
-    // useEffect(() => {
-    //     // getWorkoutsByProgramId(currentProgram['id'])
-    //     //     .then(response => setRawWorkouts(response))
-    // }, []);
+    // Custom functionality can be added here
+    const toggleIsProgramDeliveryEdit = () => {
+        setIsProgramDeliveryEdit(prevState => !prevState);
+    }
+
+    const toggleIsDiscordDeliveryConfigActive = (idx) => {
+        const deliveryConfigs = [...deliveryConfigDiscord]
+        deliveryConfigs[idx].is_active = !deliveryConfigs[idx].is_active
+        setDeliveryConfigDiscord(deliveryConfigs);
+    }
 
     const handleProgramDeliveryEdit = async (programDelivery, submit) => {
         if (isProgramDeliveryEdit) {
             if (submit) {
                 console.log(isProgramDeliveryEdit)
                 console.log(submit)
-                // const modProgramScheduleResult = await createProgramSchedule(newProgramSchedule)
-                // const programSchedules = await getProgramScheduleByProgramId(currentProgram['id'])
-                // setProgramSchedule(programSchedules)
-                // const dropdownValues = programSchedules.map(item => {
-                //     return {
-                //         key: item.id,
-                //         text: `${formatTimestamp(item.start_date)} - ${formatTimestamp(item.end_date)}`,
-                //         value: item.id
-                //     }
-                // })
-                // setProgramScheduleDropdown(dropdownValues)
+                console.log(currentProgram)
             }
             setIsProgramDeliveryEdit(false)
         } else {
@@ -79,74 +71,206 @@ const ProgramDelivery = ({isMobile}) => {
         }
     }
 
-    return isProgramDeliveryEdit ?
-        <EditProgramDelivery programDelivery={programDelivery} handleProgramDeliveryEdit={handleProgramDeliveryEdit} setProgramDelivery={setProgramDelivery}/> :
-        <ReadOnlyProgramDelivery programDelivery={programDelivery} handleProgramDeliveryEdit={handleProgramDeliveryEdit} setProgramDelivery={setProgramDelivery}/>
+    const contextValue = useMemo(() => ({
+        isProgramDeliveryEdit, setIsProgramDeliveryEdit, programDelivery, setProgramDelivery,
+        deliveryConfigDiscord, programDeliveryEmail, setProgramDeliveryEmail,
+        setDeliveryConfigDiscord, toggleIsProgramDeliveryEdit, toggleIsDiscordDeliveryConfigActive
+    }), [isProgramDeliveryEdit, deliveryConfigDiscord]);
 
+    return (<ProgramDeliveryContext.Provider value={contextValue}>
+            {
+                isProgramDeliveryEdit ?
+                    <EditProgramDelivery handleProgramDeliveryEdit={handleProgramDeliveryEdit}/> :
+                    <ReadOnlyProgramDelivery />
+            }
+        </ProgramDeliveryContext.Provider>
+    )
 }
 
-const TableExampleApprove = ({discordDeliveryConfigs, handleAddOrRemoveDiscordDelivery}) => {
-    // const [isConfigActive, setIsConfigActive] = useState(!!selectedAthlete['is_active']);
+const DeliveryConfig = () => {
+    const {isProgramDeliveryEdit} = useContext(ProgramDeliveryContext);
+    const {programDelivery} = useContext(ProgramDeliveryContext);
+    const [isDiscordActive, setIsDiscordActive] = useState(!!programDelivery['delivery_discord']);
+
+    const handleDeliveryIsActive = (event, {checked, deliveryType}) => {
+        if(deliveryType === "discord") {
+            setIsDiscordActive(checked)
+        } else {
+            setIsEmailActive(checked)
+        }
+    }
+
+    return (
+        <div>
+            <h4>Discord <span>
+            <Checkbox toggle checked={isDiscordActive}
+                      onChange={handleDeliveryIsActive}
+                      deliveryType={"discord"}
+                      style={{float: "right"}}
+                      disabled={!isProgramDeliveryEdit}
+            /></span></h4>
+        </div>
+    )
+}
+
+export const ReadOnlyProgramDelivery = () => {
+    const { toggleIsProgramDeliveryEdit } = useContext(ProgramDeliveryContext);
+    const { deliveryConfigDiscord } = useContext(ProgramDeliveryContext);
+    return (
+        <Card fluid color='red'>
+            <Card.Content>
+                <Card.Header>Delivery Configuration</Card.Header>
+                <Card.Description>
+                    <TableComponent dataList={deliveryConfigDiscord}/>
+                </Card.Description>
+            </Card.Content>
+            <Card.Content extra>
+                <div className='ui one buttons'>
+                    <Button basic color='green' onClick={() => toggleIsProgramDeliveryEdit()}>
+                        Edit
+                    </Button>
+                </div>
+            </Card.Content>
+        </Card>
+    )
+};
+
+export const EditProgramDelivery = ({handleProgramDeliveryEdit}) => {
+    const {deliveryConfigDiscord} = useContext(ProgramDeliveryContext);
+    const [dataList, setDataList] = useState(deliveryConfigDiscord);
+
+    const handleUpdate = (idx, updatedData) => {
+        const updatedList = [...dataList];
+        updatedList[idx] = updatedData;
+        setDataList(updatedList);
+    };
+
+    const handleAddDeliveryConfigDiscord = () => {
+        const deliveryConfigs = [...dataList]
+        const deepCopy = JSON.parse(JSON.stringify(IProgramDeliveryDiscord));
+        deliveryConfigs.push(deepCopy)
+        setDataList(deliveryConfigs)
+    }
+
+    const handleRemoveConfig = (idx) => {
+        const deliveryConfigs = [...dataList]
+        deliveryConfigs.splice(idx, 1)
+        setDataList(deliveryConfigs)
+    };
+
+    return (
+        <Card fluid color='red'>
+            <Card.Content>
+                <Card.Header>Delivery Configuration</Card.Header>
+                <Card.Description>
+                    <TableComponent dataList={dataList} onUpdate={handleUpdate} handleAddDeliveryConfigDiscord={handleAddDeliveryConfigDiscord} handleRemoveConfig={handleRemoveConfig}/>
+                </Card.Description>
+            </Card.Content>
+            <Card.Content extra>
+                <div className='ui two buttons'>
+                    <Button basic color='green' onClick={() => handleProgramDeliveryEdit({}, true)}>
+                        Submit
+                    </Button>
+                    <Button basic color='red' onClick={() => handleProgramDeliveryEdit({}, false)}>
+                        Cancel
+                    </Button>
+                </div>
+            </Card.Content>
+        </Card>
+    )
+};
+
+const DataTableRow = ({ initialData, onUpdate, idx, handleRemoveConfig }) => {
+    const {isProgramDeliveryEdit} = useContext(ProgramDeliveryContext);
+    const [configData, setConfigData] = useState(initialData);
+
+    useEffect(() => {
+        setConfigData(initialData);
+    }, [initialData]);
+
     const options = [
         { key: 'channel', text: 'Channel', value: 'channel' },
         // { key: 'dm', text: 'Direct Message', value: 'dm' }
     ]
 
-    // const handleConfigIsActive = (event, data) => {
-    //     setIsActive(data.checked)
-    //     updateAthleteValues(data.checked ? 1 : 0, "is_active")
-    // }
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        const updatedData = { ...configData, [name]: value };
+        setConfigData(updatedData);
+        onUpdate(idx, updatedData);
+    };
 
-    const TableRows = () => {
-        if(discordDeliveryConfigs === undefined) {
-            return (<Table.Row><Table.Cell/> <Table.Cell colSpan={3} textAlign={'center'}>No Configurations Found</Table.Cell> </Table.Row>)
-        } else {
-            return (
-                discordDeliveryConfigs.map((item, idx) => {
-                    return (
-                        <Table.Row>
-                            <Table.Cell collapsing>
-                                <Checkbox toggle checked={item.is_active} onClick={() => handleAddOrRemoveDiscordDelivery(idx)}/>
-                            </Table.Cell>
-                            <Table.Cell>
-                                <Dropdown
-                                    fluid
-                                    selection
-                                    clearable
-                                    value={item['type']}
-                                    options={options}
-                                    // onChange={setMovementData}
-                                    attribute={'type'}
-                                    idx={idx}
-                                />
-                            </Table.Cell>
-                            <Table.Cell>
-                                <Input fluid placeholder='remote athletes channel'/>
-                            </Table.Cell>
-                            <Table.Cell>
-                                <Input fluid placeholder='https://discord.com/api/webhooks/...'/>
-                            </Table.Cell>
-                        </Table.Row>
-                    )
-                })
-            )
-        }
+    const handleConfigIsActive = (event, data) => {
+        const updatedData = { ...configData, ['is_active']: data.checked };
+        setConfigData(updatedData);
+        onUpdate(idx, updatedData);
     }
 
-    return (<Table compact celled definition>
+    return (
+        <Table.Row>
+            <Table.Cell collapsing>
+                <Checkbox toggle checked={configData.is_active} name={"is_active"} onClick={handleConfigIsActive}/>
+            </Table.Cell>
+            <Table.Cell>
+                <Dropdown
+                    disabled={!isProgramDeliveryEdit}
+                    fluid
+                    selection
+                    clearable
+                    value={configData['type']}
+                    options={options}
+                    // onChange={setMovementData}
+                    name={'type'}
+                />
+            </Table.Cell>
+            <Table.Cell>
+                <ReadEditInput
+                    value={configData.channel_name}
+                    onChangeHandler={handleChange}
+                    placeholder='remote athletes channel'
+                    readOnly={!isProgramDeliveryEdit}
+                    name={"channel_name"}
+                />
+            </Table.Cell>
+            <Table.Cell>
+                <ReadEditInput
+                    value={configData.channel}
+                    onChangeHandler={handleChange}
+                    placeholder='https://discord.com/api/webhooks/...'
+                    readOnly={!isProgramDeliveryEdit}
+                    name={"channel"}
+                />
+            </Table.Cell>
+            <Table.Cell collapsing>
+                {
+                    configData.id === null ? <Icon name={"x"} color={"red"} onClick={e => handleRemoveConfig(idx)}/> : <div />
+                }
+            </Table.Cell>
+        </Table.Row>
+    );
+};
+
+const TableComponent = ({ dataList, onUpdate, handleAddDeliveryConfigDiscord, handleRemoveConfig}) => {
+    const {isProgramDeliveryEdit} = useContext(ProgramDeliveryContext);
+    return (
+        <Table compact celled definition>
             <Table.Header>
                 <Table.Row>
-                    <Table.HeaderCell/>
+                    <Table.HeaderCell />
                     <Table.HeaderCell>Type</Table.HeaderCell>
                     <Table.HeaderCell>Nickname</Table.HeaderCell>
                     <Table.HeaderCell>Webhook</Table.HeaderCell>
+                    <Table.HeaderCell />
                 </Table.Row>
             </Table.Header>
-
             <Table.Body>
-                <TableRows />
-            </Table.Body>
+            {
+                (dataList && dataList.length > 0) ? dataList.map((data, idx) => (
+                    <DataTableRow key={data.id} initialData={data} onUpdate={onUpdate} idx={idx} handleRemoveConfig={handleRemoveConfig}/>
+                )) : <Table.Row><Table.Cell/> <Table.Cell colSpan={3} textAlign={'center'}>No Configurations Found</Table.Cell> </Table.Row>
 
+            }
+            </Table.Body>
             <Table.Footer fullWidth>
                 <Table.Row>
                     <Table.HeaderCell/>
@@ -157,160 +281,17 @@ const TableExampleApprove = ({discordDeliveryConfigs, handleAddOrRemoveDiscordDe
                             labelPosition='left'
                             primary
                             size='small'
-                            onClick={() => handleAddOrRemoveDiscordDelivery()}
+                            onClick={() => handleAddDeliveryConfigDiscord()}
+                            disabled={!isProgramDeliveryEdit}
                         >
-                            <Icon name='user'/> Add Config
+                            <Icon name='wrench'/> Add Config
                         </Button>
                     </Table.HeaderCell>
                 </Table.Row>
             </Table.Footer>
         </Table>
-    )
-}
-
-const DeliveryConfig = ({programDelivery, setProgramDelivery}) => {
-    const [isDiscordActive, setIsDiscordActive] = useState(!!programDelivery['delivery_discord']);
-    const [isEmailActive, setIsEmailActive] = useState(!!programDelivery['delivery_email']);
-    const [discordDeliveryConfigs, setDiscordDeliveryConfigs] = useState([]);
-
-    const options = [
-        { key: 'channel', text: 'Channel', value: 'channel' },
-        // { key: 'dm', text: 'Direct Message', value: 'dm' }
-    ]
-
-    const updateAthleteValues = (value, attribute) => {
-        const delivery = {...programDelivery};
-        delivery[attribute] = value;
-        setProgramDelivery(delivery);
-    }
-
-    const handleDeliveryIsActive = (event, {checked, deliveryType}) => {
-        if(deliveryType === "discord") {
-            setIsDiscordActive(checked)
-        } else {
-            setIsEmailActive(checked)
-        }
-        // updateAthleteValues(data.checked ? 1 : 0, "is_active")
-    }
-
-    const handleAddOrRemoveDiscordDelivery = (idx) => {
-        if(idx === undefined) {
-            const deliveryConfigs = [...discordDeliveryConfigs]
-            const deepCopy = JSON.parse(JSON.stringify(IProgramDeliveryDiscord));
-            deliveryConfigs.push(deepCopy)
-            setDiscordDeliveryConfigs(deliveryConfigs)
-        } else {
-            const deliveryConfigs = [...discordDeliveryConfigs]
-            const toRemove = deliveryConfigs[idx]
-            toRemove.is_active = !toRemove.is_active
-            deliveryConfigs[idx] = toRemove
-            setDiscordDeliveryConfigs(deliveryConfigs)
-        }
-        // updateAthleteValues(data.checked ? 1 : 0, "is_active")
-    }
-
-    return (
-        <div>
-            <div>
-                <h4>Discord <span>
-                <Checkbox toggle checked={isDiscordActive}
-                          onChange={handleDeliveryIsActive}
-                          deliveryType={"discord"}
-                          style={{float: "right"}}
-                /></span></h4>
-                <Divider/>
-            </div>
-            <div>
-                <TableExampleApprove discordDeliveryConfigs={discordDeliveryConfigs} handleAddOrRemoveDiscordDelivery={handleAddOrRemoveDiscordDelivery}/>
-            </div>
-        </div>
-        // <Grid columns={2} celled='internally'>
-        //     <Grid.Row>
-        //         <Grid.Column>
-        //             Discord?
-        //             <Checkbox checked={isDiscordActive}
-        //                       onChange={handleDeliveryIsActive}
-        //                       deliveryType={"discord"}
-        //                       style={{float: "right"}}
-        //             />
-        //         </Grid.Column>
-        //         <Grid.Column>
-        //             Email?
-        //             <Checkbox checked={isEmailActive}
-        //                       onChange={handleDeliveryIsActive}
-        //                       deliveryType={"email"}
-        //                       style={{float: "right"}}
-        //             />
-        //         </Grid.Column>
-        //     </Grid.Row>
-        //
-        //     <Grid.Row>
-        //         <Grid.Column>
-        //             {
-        //                 discordDeliveryConfigs.map((item, idx) => {
-        //                     return (
-        //                         <Form.Group widths='equal' key={idx}>
-        //                             <Form.Select
-        //                                 fluid
-        //                                 label='Type'
-        //                                 options={options}
-        //                                 placeholder='Channel'
-        //                             />
-        //                             <Form.Input fluid label='webhook' placeholder='https://discord.com/api/webhooks/...' />
-        //                             <Form.Input fluid label='name' placeholder='name' />
-        //                             <Icon name='x' color="red" onClick={() => handleAddOrRemoveDiscordDelivery(idx)}/>
-        //                         </Form.Group>
-        //                     )
-        //                 })
-        //             }
-        //             Add Config
-        //             <Icon name='plus' color="green" onClick={() => handleAddOrRemoveDiscordDelivery()}/>
-        //         </Grid.Column>
-        //         <Grid.Column>
-        //             Email options
-        //         </Grid.Column>
-        //     </Grid.Row>
-        // </Grid>
-    )
-}
-
-export const ReadOnlyProgramDelivery = ({programDelivery, handleProgramDeliveryEdit, setProgramDelivery}) => {
-    return (
-        <Card fluid color='red'>
-            <Card.Content>
-                <Card.Header>Delivery Configuration</Card.Header>
-                <Card.Description>
-                    <DeliveryConfig programDelivery={programDelivery} setProgramDelivery={setProgramDelivery}/>
-                </Card.Description>
-            </Card.Content>
-            <Card.Content extra>
-                <div className='ui one buttons'>
-                    <Button basic color='green' onClick={() => handleProgramDeliveryEdit({}, true)}>
-                        Edit
-                    </Button>
-                </div>
-            </Card.Content>
-        </Card>
-    )
+    );
 };
 
-export const EditProgramDelivery = ({currentProgram, handleProgramDeliveryEdit}) => {
-    return (
-        <Card fluid color='red'>
-            <Card.Content>
-                <Card.Header>Delivery Configuration</Card.Header>
-                <Card.Description>{currentProgram['description']}</Card.Description>
-                <Card.Meta>{currentProgram['type']}</Card.Meta>
-            </Card.Content>
-            <Card.Content extra>
-                <div className='ui one buttons'>
-                    <Button basic color='green' onClick={() => handleProgramDeliveryEdit({}, true)}>
-                        Submit
-                    </Button>
-                </div>
-            </Card.Content>
-        </Card>
-    )
-};
 
 export default ProgramDelivery;
