@@ -10,6 +10,13 @@ import {
 } from "semantic-ui-react";
 import {ProgramContext, ProgramDeliveryContext} from '../programContext';
 import ReadEditInput from "./General/ReadEditInput";
+import {
+    createProgramDeliveryDiscordConfig,
+    getProgramDeliveryDiscordConfigs,
+    getProgramDeliveryDiscordConfigsByProgramId,
+    removeProgramDeliveryDiscordConfigs,
+    updateProgramDeliveryDiscordConfigs
+} from "../api";
 
 const IProgramDelivery = {
     id: null,
@@ -21,7 +28,7 @@ const IProgramDelivery = {
 
 const IProgramDeliveryDiscord = {
     id: null,
-    program_delivery_id: null,
+    program_id: null,
     type: "channel",
     channel: null,
     channel_name: null,
@@ -31,7 +38,7 @@ const IProgramDeliveryDiscord = {
 
 const IProgramDeliveryEmail = {
     id: null,
-    program_delivery_id: null,
+    program_id: null,
     email_to: null,
     is_active: true
 }
@@ -47,6 +54,11 @@ const ProgramDelivery = ({isMobile}) => {
     const [isProgramDeliveryEdit, setIsProgramDeliveryEdit] = useState(false);
     const [deliveryConfigDiscord, setDeliveryConfigDiscord] = useState([]);
 
+    useEffect(() => {
+        getProgramDeliveryDiscordConfigsByProgramId(currentProgram['id'], 1, "ASC")
+            .then((results) => setDeliveryConfigDiscord(results))
+    }, [currentProgram]);
+
     // Custom functionality can be added here
     const toggleIsProgramDeliveryEdit = () => {
         setIsProgramDeliveryEdit(prevState => !prevState);
@@ -58,12 +70,65 @@ const ProgramDelivery = ({isMobile}) => {
         setDeliveryConfigDiscord(deliveryConfigs);
     }
 
-    const handleProgramDeliveryEdit = async (programDelivery, submit) => {
+    const handleProgramDeliveryDiscordEdit = async (programDeliveryDiscord, submit) => {
         if (isProgramDeliveryEdit) {
             if (submit) {
-                console.log(isProgramDeliveryEdit)
-                console.log(submit)
-                console.log(currentProgram)
+                const keysToCompare = ['type', 'channel', 'channel_name', 'direct_message', 'is_active'];
+                //get the diff
+                const diffList = programDeliveryDiscord.filter(newConfig => {
+                    let ogConfig = deliveryConfigDiscord.filter(ogDiscordConfig => ogDiscordConfig.id === newConfig.id)
+                    if (ogConfig.length > 0) {
+                        ogConfig = ogConfig[0]
+                        if (!keysToCompare.every(key => ogConfig[key] === newConfig[key])) {
+                            return newConfig
+                        }
+                    }
+                })
+
+                // inserts => where program_schedule_id is null AND is_assigned = 1
+                let inserts = programDeliveryDiscord.filter(config => {
+                    if (config.id === null) {
+                        return config
+                    }
+                })
+                inserts = inserts.map(config => {
+                    const copy = {...config}
+                    copy.program_id = currentProgram.id
+                    copy.is_active = config.is_active ? 1 : 0
+                    return copy
+                })
+
+                // updates => where id is NOT null AND is_active = 1
+                let updates = diffList.filter(config => {
+                    if (config.id !== null && config.is_active) {
+                        return config
+                    }
+                })
+                updates = updates.map(config => {
+                    const copy = {...config}
+                    copy.is_active = config.is_active ? 1 : 0
+                    return copy
+                })
+
+                // "deletes" => where program_schedule_id is NOT null AND is_active = 0
+                const deletes = diffList.filter(config => {
+                    if (config.id !== null && !config.is_active) {
+                        return config
+                    }
+                })
+
+                if (inserts.length > 0) {
+                    await createProgramDeliveryDiscordConfig(inserts)
+                }
+                if (updates.length > 0) {
+                    await updateProgramDeliveryDiscordConfigs(updates)
+                }
+                if (deletes.length > 0) {
+                    await removeProgramDeliveryDiscordConfigs(deletes.map(ass => ass.id))
+                }
+                getProgramDeliveryDiscordConfigsByProgramId(currentProgram['id'], 1, "ASC")
+                    .then((results) => setDeliveryConfigDiscord(results))
+                // setDeliveryConfigDiscord(programDeliveryDiscord)
             }
             setIsProgramDeliveryEdit(false)
         } else {
@@ -80,7 +145,7 @@ const ProgramDelivery = ({isMobile}) => {
     return (<ProgramDeliveryContext.Provider value={contextValue}>
             {
                 isProgramDeliveryEdit ?
-                    <EditProgramDelivery handleProgramDeliveryEdit={handleProgramDeliveryEdit}/> :
+                    <EditProgramDelivery handleProgramDeliveryDiscordEdit={handleProgramDeliveryDiscordEdit}/> :
                     <ReadOnlyProgramDelivery />
             }
         </ProgramDeliveryContext.Provider>
@@ -135,7 +200,7 @@ export const ReadOnlyProgramDelivery = () => {
     )
 };
 
-export const EditProgramDelivery = ({handleProgramDeliveryEdit}) => {
+export const EditProgramDelivery = ({handleProgramDeliveryDiscordEdit}) => {
     const {deliveryConfigDiscord} = useContext(ProgramDeliveryContext);
     const [dataList, setDataList] = useState(deliveryConfigDiscord);
 
@@ -168,10 +233,10 @@ export const EditProgramDelivery = ({handleProgramDeliveryEdit}) => {
             </Card.Content>
             <Card.Content extra>
                 <div className='ui two buttons'>
-                    <Button basic color='green' onClick={() => handleProgramDeliveryEdit({}, true)}>
+                    <Button basic color='green' onClick={() => handleProgramDeliveryDiscordEdit(dataList, true)}>
                         Submit
                     </Button>
-                    <Button basic color='red' onClick={() => handleProgramDeliveryEdit({}, false)}>
+                    <Button basic color='red' onClick={() => handleProgramDeliveryDiscordEdit({}, false)}>
                         Cancel
                     </Button>
                 </div>
@@ -209,7 +274,7 @@ const DataTableRow = ({ initialData, onUpdate, idx, handleRemoveConfig }) => {
     return (
         <Table.Row>
             <Table.Cell collapsing>
-                <Checkbox toggle checked={configData.is_active} name={"is_active"} onClick={handleConfigIsActive}/>
+                <Checkbox toggle checked={configData.is_active} name={"is_active"} onClick={handleConfigIsActive} disabled={!isProgramDeliveryEdit}/>
             </Table.Cell>
             <Table.Cell>
                 <Dropdown
@@ -241,11 +306,14 @@ const DataTableRow = ({ initialData, onUpdate, idx, handleRemoveConfig }) => {
                     name={"channel"}
                 />
             </Table.Cell>
-            <Table.Cell collapsing>
-                {
-                    configData.id === null ? <Icon name={"x"} color={"red"} onClick={e => handleRemoveConfig(idx)}/> : <div />
-                }
-            </Table.Cell>
+            {
+                isProgramDeliveryEdit ?
+                <Table.Cell collapsing>
+                    {
+                        configData.id === null ? <Icon name={"x"} color={"red"} onClick={e => handleRemoveConfig(idx)}/> : <div />
+                    }
+                </Table.Cell> : undefined
+            }
         </Table.Row>
     );
 };
@@ -260,7 +328,9 @@ const TableComponent = ({ dataList, onUpdate, handleAddDeliveryConfigDiscord, ha
                     <Table.HeaderCell>Type</Table.HeaderCell>
                     <Table.HeaderCell>Nickname</Table.HeaderCell>
                     <Table.HeaderCell>Webhook</Table.HeaderCell>
-                    <Table.HeaderCell />
+                    {
+                        isProgramDeliveryEdit ? <Table.HeaderCell /> : undefined
+                    }
                 </Table.Row>
             </Table.Header>
             <Table.Body>

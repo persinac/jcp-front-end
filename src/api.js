@@ -267,6 +267,77 @@ export const removeAthletes = async (athleteIds) => {
     return await response.json()
 }
 
+/*******************************
+    PROGRAM DELIVERY
+ *******************************/
+const programDeliveryDiscordDomain = "program-delivery"
+const programDeliveryDiscordSubDomain = "discord"
+const discordDeliveryURL = `${process.env.API_URL}/${programDeliveryDiscordDomain}/${programDeliveryDiscordSubDomain}`
+export const getProgramDeliveryDiscordConfigs = async (currentPage, sortBy) => {
+    const pageSize = 10;
+    const sortByNameAscDesc = sortBy || "ASC";
+    const response = await fetch(`${discordDeliveryURL}?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortByNameAscDesc}`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const getProgramDeliveryDiscordConfigsByProgramId = async (programId, currentPage, sortBy) => {
+    const pageSize = 10;
+    const sortByNameAscDesc = sortBy || "ASC";
+    const response = await fetch(`${discordDeliveryURL}/program/${programId}?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortByNameAscDesc}`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const getProgramDeliveryDiscordConfigById = async (configId) => {
+    const response = await fetch(`${discordDeliveryURL}/${configId}`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const createProgramDeliveryDiscordConfig = async (listOfConfigs) => {
+    const response = await fetch(`${discordDeliveryURL}/create`,
+        {
+            method: "POST",
+            body: JSON.stringify(listOfConfigs),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+export const updateProgramDeliveryDiscordConfigs = async (listOfConfigs) => {
+    const response = await fetch(`${discordDeliveryURL}/update`,
+        {
+            method: "PUT",
+            body: JSON.stringify(listOfConfigs),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+export const removeProgramDeliveryDiscordConfigs = async (configIds) => {
+    const response = await fetch(`${discordDeliveryURL}/remove`,
+        {
+            method: "DELETE",
+            body: JSON.stringify(configIds),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+    return await response.json()
+}
+
 export const getAccountingDataCount = async (table) => {
     const response = await fetch(`${process.env.API_URL}/table/${table}/count`,
         {
