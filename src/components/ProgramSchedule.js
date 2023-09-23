@@ -31,11 +31,45 @@ const formatTimestampForDatePicker = (dateToFormat) => {
     return `${year}-${month}-${day} 00:00:00`;
 }
 
+function getWeeksBetweenDates(startDate, endDate) {
+    const millisecondsPerWeek = 1000 * 60 * 60 * 24 * 7; // Number of milliseconds in a week
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const differenceInMilliseconds = end.getTime() - start.getTime();
+
+    return differenceInMilliseconds / millisecondsPerWeek;
+}
+
+function addWeeksToDate(startDate, numberOfWeeks) {
+    const millisecondsPerWeek = 1000 * 60 * 60 * 24 * 7; // Number of milliseconds in a week
+    const start = new Date(startDate);
+
+    // Add the total milliseconds for the given number of weeks to the start date
+    const newDateInMilliseconds = start.getTime() + (numberOfWeeks * millisecondsPerWeek);
+
+    return new Date(newDateInMilliseconds);
+}
+
 const CustomModal = ({isModalOpen, handleShowModal, programId, handleCreateProgramSchedule}) => {
     const [newProgramSchedule, setNewProgramSchedule] = useState({program_id: programId, start_date: new Date(), end_date: new Date()});
+    const [numOfWeeks, setNumOfWeeks] = useState(0);
+
+    useEffect(() => {
+        const weeks = Math.ceil(getWeeksBetweenDates(newProgramSchedule.start_date, newProgramSchedule.end_date))
+        setNumOfWeeks(weeks)
+    }, [newProgramSchedule.end_date]);
     const programScheduleInputHandler = (e, {value, attribute}) => {
         const copyProgramSchedule = {...newProgramSchedule}
         copyProgramSchedule[attribute] = value
+        setNewProgramSchedule(copyProgramSchedule);
+    };
+
+    const numWeeksInputHandler = (e) => {
+        setNumOfWeeks(e);
+        const newEndDate = addWeeksToDate(newProgramSchedule.start_date, e)
+        const copyProgramSchedule = {...newProgramSchedule}
+        copyProgramSchedule["end_date"] = newEndDate
         setNewProgramSchedule(copyProgramSchedule);
     };
 
@@ -54,6 +88,14 @@ const CustomModal = ({isModalOpen, handleShowModal, programId, handleCreateProgr
                         </Form.Field>
                         <Form.Field style={{ flexGrow: "1" }}>
                             <SemanticDatepicker  placeholder='End Date' inline={true} value={newProgramSchedule.end_date} onChange={programScheduleInputHandler} attribute={"end_date"}/>
+                        </Form.Field>
+                    </Form.Group>
+                    <Form.Group style={{ display: "flex" }}>
+                        <Form.Field style={{ flexGrow: "1" }}>
+                            <Form.Input fluid label='Number of Weeks' placeholder='4'
+                                        value={numOfWeeks}
+                                        onChange={(e) => numWeeksInputHandler(e.target.value, "type")}
+                            />
                         </Form.Field>
                     </Form.Group>
                 </Form>
@@ -154,6 +196,7 @@ export const EditProgramSchedule = ({programScheduleDropdownValues, handleProgra
 export const EditProgramScheduleDates = ({selectedSchedule, setSelectedSchedule}) => {
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
+    const [numOfWeeks, setNumOfWeeks] = useState(0);
 
     useEffect(() => {
         if(selectedSchedule) {
@@ -161,6 +204,13 @@ export const EditProgramScheduleDates = ({selectedSchedule, setSelectedSchedule}
             const formatted_end_date = formatTimestampForDatePicker(selectedSchedule.end_date)
             setStartDate(new Date(formatted_start_date))
             setEndDate(new Date(formatted_end_date))
+        }
+    }, [selectedSchedule]);
+
+    useEffect(() => {
+        if(selectedSchedule) {
+            const weeks = Math.ceil(getWeeksBetweenDates(selectedSchedule.start_date, selectedSchedule.end_date))
+            setNumOfWeeks(weeks)
         }
     }, [selectedSchedule]);
 
@@ -175,6 +225,14 @@ export const EditProgramScheduleDates = ({selectedSchedule, setSelectedSchedule}
         setSelectedSchedule(copySchedule)
     }
 
+    const numWeeksInputHandler = (e) => {
+        setNumOfWeeks(e);
+        const newEndDate = addWeeksToDate(selectedSchedule.start_date, e)
+        const copyProgramSchedule = {...selectedSchedule}
+        copyProgramSchedule["end_date"] = newEndDate
+        setSelectedSchedule(copyProgramSchedule);
+    };
+
     return (
         <Card.Content>
             <Card.Description>
@@ -186,6 +244,10 @@ export const EditProgramScheduleDates = ({selectedSchedule, setSelectedSchedule}
                 <SemanticDatepicker
                     datePickerOnly={true} format={"YYYY-MM-DD"}
                     value={endDate} onChange={handleDateChange} scheduleAttribute="end_date"/>
+                <Input fluid label='Number of Weeks' placeholder='4'
+                       value={numOfWeeks}
+                       onChange={(e) => numWeeksInputHandler(e.target.value, "type")}
+                />
             </Card.Description>
         </Card.Content>
     );
