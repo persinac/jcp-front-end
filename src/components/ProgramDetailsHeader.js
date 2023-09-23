@@ -8,6 +8,7 @@ import {
 } from "../api";
 import {EditProgramSchedule, ReadOnlyProgramSchedule} from "./ProgramSchedule";
 import ProgramDelivery from "./ProgramDelivery";
+import ProgramDeliveryEmail from "./ProgramDeliveryEmail";
 
 const formatTimestamp = (dateToFormat) => {
     const copyDate = new Date(dateToFormat);
@@ -200,10 +201,13 @@ export const ProgramDetailsHeader = ({
                                              handleProgramScheduleEdit={handleProgramScheduleEdit}/>
             }
 
-        </Card.Group>
-        <Card.Group>
-            <ProgramDelivery isMobile={isMobile}/>
-        </Card.Group>
+            </Card.Group>
+            <Card.Group>
+                <ProgramDelivery isMobile={isMobile}/>
+            </Card.Group>
+            <Card.Group>
+                <ProgramDeliveryEmail isMobile={isMobile}/>
+            </Card.Group>
         </div>
     );
 }

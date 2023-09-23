@@ -268,7 +268,7 @@ export const removeAthletes = async (athleteIds) => {
 }
 
 /*******************************
-    PROGRAM DELIVERY
+    PROGRAM DELIVERY - DISCORD
  *******************************/
 const programDeliveryDiscordDomain = "program-delivery"
 const programDeliveryDiscordSubDomain = "discord"
@@ -328,6 +328,77 @@ export const updateProgramDeliveryDiscordConfigs = async (listOfConfigs) => {
 
 export const removeProgramDeliveryDiscordConfigs = async (configIds) => {
     const response = await fetch(`${discordDeliveryURL}/remove`,
+        {
+            method: "DELETE",
+            body: JSON.stringify(configIds),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+    return await response.json()
+}
+
+/*******************************
+ PROGRAM DELIVERY - EMAIL
+ *******************************/
+const programDeliveryEmailDomain = "program-delivery"
+const programDeliveryEmailSubDomain = "email"
+const emailDeliveryURL = `${process.env.API_URL}/${programDeliveryEmailDomain}/${programDeliveryEmailSubDomain}`
+export const getProgramDeliveryEmailConfigs = async (currentPage, sortBy) => {
+    const pageSize = 10;
+    const sortByNameAscDesc = sortBy || "ASC";
+    const response = await fetch(`${emailDeliveryURL}?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortByNameAscDesc}`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const getProgramDeliveryEmailConfigsByProgramId = async (programId, currentPage, sortBy) => {
+    const pageSize = 10;
+    const sortByNameAscDesc = sortBy || "ASC";
+    const response = await fetch(`${emailDeliveryURL}/program/${programId}?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortByNameAscDesc}`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const getProgramDeliveryEmailConfigById = async (configId) => {
+    const response = await fetch(`${emailDeliveryURL}/${configId}`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const createProgramDeliveryEmailConfig = async (listOfConfigs) => {
+    const response = await fetch(`${emailDeliveryURL}/create`,
+        {
+            method: "POST",
+            body: JSON.stringify(listOfConfigs),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+export const updateProgramDeliveryEmailConfigs = async (listOfConfigs) => {
+    const response = await fetch(`${emailDeliveryURL}/update`,
+        {
+            method: "PUT",
+            body: JSON.stringify(listOfConfigs),
+            headers: {
+                'Content-Type': 'application/json'
+            }})
+    return await response.json()
+}
+
+export const removeProgramDeliveryEmailConfigs = async (configIds) => {
+    const response = await fetch(`${emailDeliveryURL}/remove`,
         {
             method: "DELETE",
             body: JSON.stringify(configIds),
