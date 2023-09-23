@@ -118,6 +118,11 @@ export const ReadOnlyProgramDelivery = () => {
             <Card.Content>
                 <Card.Header>Delivery Configuration - Email</Card.Header>
                 <Card.Description>
+                    <i>Note: Currently all deliveries are set to go out once per week on Sunday. The delivery will include the entire week of programming in a stacked, day-by-day format.
+                    </i>
+                    <br/>
+                </Card.Description>
+                <Card.Description>
                     <h5>Send Email to All Assigned Athletes <span><Icon name={iconName} color={iconColor}/></span></h5>
                 </Card.Description>
             </Card.Content>

@@ -184,7 +184,13 @@ export const ReadOnlyProgramDelivery = () => {
     return (
         <Card fluid color='red'>
             <Card.Content>
-                <Card.Header>Delivery Configuration</Card.Header>
+                <Card.Header>Delivery Configuration - Discord</Card.Header>
+                <Card.Description>
+                    <i>
+                        Note: Currently all deliveries are set to go out once per week on Sunday. The delivery will include the entire week of programming in a stacked, day-by-day format.
+                    </i>
+                    <br/>
+                </Card.Description>
                 <Card.Description>
                     <TableComponent dataList={deliveryConfigDiscord}/>
                 </Card.Description>
@@ -226,7 +232,7 @@ export const EditProgramDelivery = ({handleProgramDeliveryDiscordEdit}) => {
     return (
         <Card fluid color='red'>
             <Card.Content>
-                <Card.Header>Delivery Configuration</Card.Header>
+                <Card.Header>Delivery Configuration - Discord</Card.Header>
                 <Card.Description>
                     <TableComponent dataList={dataList} onUpdate={handleUpdate} handleAddDeliveryConfigDiscord={handleAddDeliveryConfigDiscord} handleRemoveConfig={handleRemoveConfig}/>
                 </Card.Description>
