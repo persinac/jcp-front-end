@@ -1,12 +1,12 @@
 # Order of Ops
 1. Create the repo:
 ```
-aws ecr create-repository --repository-name jcp-ui
+aws ecr create-repository --repository-name fitcartographer-ui
 ```
 
 2. For ease of use, tag the local image with your ecr url:
 ```
-docker tag jcp-ui:latest 059039070213.dkr.ecr.us-east-1.amazonaws.com/jcp-ui
+docker tag fitcartographer-ui:latest 059039070213.dkr.ecr.us-east-1.amazonaws.com/fitcartographer-ui
 ```
 
 3. Push to repo
@@ -24,7 +24,7 @@ docker push 059039070213.dkr.ecr.us-east-1.amazonaws.com/jcp-ui
 4. log into ec2 instance
 5. stop & rm the container
 6. pull new image
-7. restart containerw
+7. restart container
 
 ## Useful commands
 ```
