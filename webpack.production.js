@@ -7,7 +7,7 @@ module.exports = merge(common, {
     devtool: 'source-map',
     plugins: [
         new webpack.DefinePlugin({
-            "process.env.API_URL": JSON.stringify("https://whereverthisendsup.stuff")
+            "process.env.API_URL": JSON.stringify("https://fitcartographer.com")
         }),
     ]
 });
