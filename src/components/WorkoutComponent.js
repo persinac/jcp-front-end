@@ -156,7 +156,7 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
                     day: dayEdit,
                     movementDescription: item['movement_description'],
                     movementNotes: item['movement_notes'],
-                    movementOrder: item['movement_order'] || idx + 1
+                    movementOrder: movement_order
                 }
             })
             const updateWorkoutResponse = await updateWorkouts(movementEditsToSubmit)
