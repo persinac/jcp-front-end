@@ -58,10 +58,6 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
         const deepCopy = JSON.parse(JSON.stringify(weekToCopy));
         const newMovements = deepCopy.days.map((item, idx) => {
             return item.movements.map((movements, idx) => {
-                let movement_order = movements['movement_order']
-                if(movement_order === undefined) {
-                    movement_order = idx + 1
-                }
                 return {
                     id: null,
                     programId: currentProgram['id'],
@@ -149,6 +145,10 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
         }
         if(movementEditsToSubmit.length > 0) {
             movementEditsToSubmit = movementEditsToSubmit.map((item, idx) => {
+                let movement_order = movements['movement_order']
+                if(movement_order === undefined) {
+                    movement_order = idx + 1
+                }
                 return {
                     id: item['id'],
                     programId: currentProgram['id'],
