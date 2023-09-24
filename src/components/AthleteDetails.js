@@ -31,7 +31,10 @@ const ReadOnlyAthleteHeader = ({selectedAthlete, handleAthleteEdit}) => {
                 <Card.Description>
                     <Grid celled>
                         <Grid.Row>
-                            <Grid.Column width={12}>
+                            <Grid.Column width={6}>
+                                {selectedAthlete['email_address']}
+                            </Grid.Column>
+                            <Grid.Column width={6}>
                                 {selectedAthlete['discord_name']}
                             </Grid.Column>
                             <Grid.Column>
@@ -76,6 +79,10 @@ export const EditAthleteHeader = ({selectedAthlete, handleAthleteEdit}) => {
                         <Form.Input fluid label='Name' placeholder='Jane Smith'
                                     value={athleteEdit.name}
                                     onChange={(e) => updateAthleteValues(e.target.value, "name")}
+                        />
+                        <Form.Input fluid label='Email' placeholder='user@gmail.com'
+                                    value={athleteEdit.email_address}
+                                    onChange={(e) => updateAthleteValues(e.target.value, "email_address")}
                         />
                         <Form.Input fluid label='Discord' placeholder='user#1234'
                                     value={athleteEdit.discord_name}

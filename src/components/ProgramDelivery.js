@@ -234,7 +234,12 @@ export const EditProgramDelivery = ({handleProgramDeliveryDiscordEdit}) => {
             <Card.Content>
                 <Card.Header>Delivery Configuration - Discord</Card.Header>
                 <Card.Description>
-                    <TableComponent dataList={dataList} onUpdate={handleUpdate} handleAddDeliveryConfigDiscord={handleAddDeliveryConfigDiscord} handleRemoveConfig={handleRemoveConfig}/>
+                    <TableComponent
+                        dataList={dataList}
+                        onUpdate={handleUpdate}
+                        handleAddDeliveryConfigDiscord={handleAddDeliveryConfigDiscord}
+                        handleRemoveConfig={handleRemoveConfig}
+                    />
                 </Card.Description>
             </Card.Content>
             <Card.Content extra>
@@ -318,7 +323,7 @@ const DataTableRow = ({ initialData, onUpdate, idx, handleRemoveConfig }) => {
                     {
                         configData.id === null ? <Icon name={"x"} color={"red"} onClick={e => handleRemoveConfig(idx)}/> : <div />
                     }
-                </Table.Cell> : undefined
+                </Table.Cell> : <Table.Cell collapsing />
             }
         </Table.Row>
     );
@@ -334,9 +339,7 @@ const TableComponent = ({ dataList, onUpdate, handleAddDeliveryConfigDiscord, ha
                     <Table.HeaderCell>Type</Table.HeaderCell>
                     <Table.HeaderCell>Nickname</Table.HeaderCell>
                     <Table.HeaderCell>Webhook</Table.HeaderCell>
-                    {
-                        isProgramDeliveryEdit ? <Table.HeaderCell /> : undefined
-                    }
+                    <Table.HeaderCell />
                 </Table.Row>
             </Table.Header>
             <Table.Body>
