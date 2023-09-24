@@ -145,7 +145,7 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
         }
         if(movementEditsToSubmit.length > 0) {
             movementEditsToSubmit = movementEditsToSubmit.map((item, idx) => {
-                let movement_order = movements['movement_order']
+                let movement_order = item['movement_order']
                 if(movement_order === undefined) {
                     movement_order = idx + 1
                 }
