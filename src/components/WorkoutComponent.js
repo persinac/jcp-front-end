@@ -57,14 +57,18 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
         })[0]
         const deepCopy = JSON.parse(JSON.stringify(weekToCopy));
         const newMovements = deepCopy.days.map((item, idx) => {
-            return item.movements.map((movements, idx) => {
+            return item.movements.map((movement, midx) => {
+                let movement_order = movement['movement_order']
+                if(movement_order === undefined) {
+                    movement_order = midx + 1
+                }
                 return {
                     id: null,
                     programId: currentProgram['id'],
                     week: deepCopy.week + 1,
                     day: item.day,
-                    movementDescription: movements['movement_description'],
-                    movementNotes: movements['movement_notes'],
+                    movementDescription: movement['movement_description'],
+                    movementNotes: movement['movement_notes'],
                     movementOrder: movement_order
                 }
             })
@@ -96,15 +100,19 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
             const deepCopy = JSON.parse(JSON.stringify(weeksToUpdate));
             const movementsToUpdate = deepCopy.map((weekWorkout) => {
                 return weekWorkout.days.map((item, idx) => {
-                    return item.movements.map((movements, idx) => {
+                    return item.movements.map((movement, midx) => {
+                        let movement_order = movement['movement_order']
+                        if(movement_order === undefined) {
+                            movement_order = midx + 1
+                        }
                         return {
-                            id: movements['id'],
+                            id: movement['id'],
                             programId: currentProgram['id'],
                             week: weekWorkout.week - 1,
                             day: item.day,
-                            movementDescription: movements['movement_description'],
-                            movementNotes: movements['movement_notes'],
-                            movementOrder: movements['movement_order'] || idx + 1
+                            movementDescription: movement['movement_description'],
+                            movementNotes: movement['movement_notes'],
+                            movementOrder: movement_order
                         }
                     })
                 })

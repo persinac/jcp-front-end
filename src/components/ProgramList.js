@@ -135,7 +135,7 @@ const ProgramList = ({handleShowProgramDetails, programPageHandler, programData,
     return (
         <div>
             {isCreateProgram ? <ProgramCreateNew handleNewProgramSubmit={handleNewProgramSubmit}/> :
-                <div className="ui container">
+                <div className="ui container container-width-100">
                     <div>
                         <TableItUp table={"programs"} data={programData}/>
                     </div>

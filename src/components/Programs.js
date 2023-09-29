@@ -37,7 +37,7 @@ const Programs = () => {
 
 
     return (
-        <Container>
+        <Container className={'container-width-100'}>
             <div className="d-flex flex-row justify-content-center">
                 {!showProgramDetails ?
                     <ProgramList handleShowProgramDetails={handleShowProgramDetails}

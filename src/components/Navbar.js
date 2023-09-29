@@ -8,6 +8,7 @@ const NavigationBar = () => {
             <Menu.Item  name='home' href="/"/>
             <Menu.Item  name='programs' href="/programs"/>
             <Menu.Item  name='athletes' href="/athletes"/>
+            <Menu.Item  name='settings' href="/settings"/>
             <Menu.Menu position='right'>
                 <Menu.Item right name='login' href="/login"/>
             </Menu.Menu>

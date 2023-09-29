@@ -11,6 +11,7 @@ import {
 } from "react-router-dom"
 import Programs from "./components/Programs";
 import AthleteManagement from "./components/AthleteManagement";
+import Settings from "./components/Settings/Settings";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
                 <Route exact path="/" element={<Home />} />
                 <Route exact path="/programs" element={<Programs />} />
                 <Route exact path="/athletes" element={<AthleteManagement />} />
+                <Route exact path="/settings" element={<Settings />} />
             </Routes>
         </BrowserRouter>
     </div>
