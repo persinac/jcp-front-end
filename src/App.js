@@ -9,7 +9,7 @@ import {
     Route,
     Routes
 } from "react-router-dom"
-import Programs from "./components/Programs";
+import Programs from "./components/Program/Programs";
 import AthleteManagement from "./components/AthleteManagement";
 import Settings from "./components/Settings/Settings";
 

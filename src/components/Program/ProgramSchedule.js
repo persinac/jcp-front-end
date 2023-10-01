@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {
     getProgramAssignmentForAssignment, getProgramScheduleByProgramId,
-} from "../api"
+} from "../../api"
 import {
     Button,
     Card,
@@ -11,7 +11,7 @@ import {
 import SemanticDatepicker from 'react-semantic-ui-datepickers';
 import {EditProgramAssignment} from "./ProgramAssignment";
 import 'semantic-ui-css/semantic.min.css';
-import "../sidecar.css"
+import "../../sidecar.css"
 
 const formatTimestamp = (dateToFormat) => {
     const copyDate = new Date(dateToFormat);

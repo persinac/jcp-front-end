@@ -2,8 +2,8 @@ import React, {useEffect, useState} from "react";
 import SemanticDatepicker from 'react-semantic-ui-datepickers';
 import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
 import {Button, Card, Checkbox, Container, Divider, Icon, Input, Form, TextArea} from "semantic-ui-react";
-import ButtonComponent from "./General/Button";
-import {postProgramAndSchedule} from "../api";
+import ButtonComponent from "../General/Button";
+import {postProgramAndSchedule} from "../../api";
 
 /*****
  * How could we make the input easier to use? Make is a self contained function with its own state

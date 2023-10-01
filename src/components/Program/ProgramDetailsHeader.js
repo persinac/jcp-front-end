@@ -5,7 +5,7 @@ import {
     getProgramScheduleByProgramId,
     updateProgramAssignments,
     updateProgramSchedule
-} from "../api";
+} from "../../api";
 import {EditProgramSchedule, ReadOnlyProgramSchedule} from "./ProgramSchedule";
 import ProgramDelivery from "./ProgramDelivery";
 import ProgramDeliveryEmail from "./ProgramDeliveryEmail";

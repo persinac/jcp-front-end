@@ -54,7 +54,16 @@ export const deleteDiscordSettings = async (discordSettingIds) => {
 }
 
 export const fuzzySearchForAutoComplete = async (input) => {
-    const response = await fetch(`${SETTINGS_DISCORD_URL}/search?input=${input}`,
+    const response = await fetch(`${SETTINGS_DISCORD_URL}/search?by=channel_name&input=${input}`,
+        {
+            method: "GET",
+            headers: {}
+        })
+    return await response.json()
+}
+
+export const getConfigById = async (input) => {
+    const response = await fetch(`${SETTINGS_DISCORD_URL}/search?by=id&input=${input}`,
         {
             method: "GET",
             headers: {}

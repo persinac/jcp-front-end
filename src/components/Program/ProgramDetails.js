@@ -2,11 +2,12 @@ import React, {useContext, useEffect, useState} from "react";
 import {
     getWorkoutsByProgramId,
     updateProgram
-} from "../api"
+} from "../../api"
 import {Button, Card, Tab} from "semantic-ui-react";
-import {ProgramContext, WorkoutContext} from '../programContext';
-import WorkoutComponent from "./WorkoutComponent";
+import {ProgramContext, WorkoutContext} from '../../programContext';
+import WorkoutComponent from "../WorkoutComponent";
 import {ProgramDetailsHeader} from "./ProgramDetailsHeader";
+import CoachesNotes from "./Notes";
 
 const ProgramDetails = () => {
 
@@ -139,6 +140,14 @@ const ProgramDetails = () => {
                     <WorkoutContext.Provider value={{setDidEdit, setFormattedWorkouts}}>
                         <WorkoutComponent workoutData={formattedWorkouts} isMobile={isMobile} didEdit={didEdit}/>
                     </WorkoutContext.Provider>
+                </Card.Group>
+            </Tab.Pane>,
+        },
+        {
+            menuItem: 'Notes',
+            render: () => <Tab.Pane attached={false}>
+                <Card.Group stackable={true}>
+                    <CoachesNotes currentProgram={currentProgram}/>
                 </Card.Group>
             </Tab.Pane>,
         }

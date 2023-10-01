@@ -8,15 +8,17 @@ import {
     Divider,
     Dropdown, Input
 } from "semantic-ui-react";
-import {ProgramContext, ProgramDeliveryContext} from '../programContext';
-import ReadEditInput from "./General/ReadEditInput";
+import {ProgramContext, ProgramDeliveryContext} from '../../programContext';
+import ReadEditInput from "../General/ReadEditInput";
 import {
     createProgramDeliveryDiscordConfig,
     getProgramDeliveryDiscordConfigs,
     getProgramDeliveryDiscordConfigsByProgramId,
     removeProgramDeliveryDiscordConfigs,
     updateProgramDeliveryDiscordConfigs
-} from "../api";
+} from "../../api";
+import MultiSelectAutoCompleteDropdown from "../General/MultiSelectAutoCompleteDropdown";
+import {getConfigById} from "../Settings/api";
 
 const IProgramDelivery = {
     id: null,
@@ -152,32 +154,6 @@ const ProgramDelivery = ({isMobile}) => {
     )
 }
 
-const DeliveryConfig = () => {
-    const {isProgramDeliveryEdit} = useContext(ProgramDeliveryContext);
-    const {programDelivery} = useContext(ProgramDeliveryContext);
-    const [isDiscordActive, setIsDiscordActive] = useState(!!programDelivery['delivery_discord']);
-
-    const handleDeliveryIsActive = (event, {checked, deliveryType}) => {
-        if(deliveryType === "discord") {
-            setIsDiscordActive(checked)
-        } else {
-            setIsEmailActive(checked)
-        }
-    }
-
-    return (
-        <div>
-            <h4>Discord <span>
-            <Checkbox toggle checked={isDiscordActive}
-                      onChange={handleDeliveryIsActive}
-                      deliveryType={"discord"}
-                      style={{float: "right"}}
-                      disabled={!isProgramDeliveryEdit}
-            /></span></h4>
-        </div>
-    )
-}
-
 export const ReadOnlyProgramDelivery = () => {
     const { toggleIsProgramDeliveryEdit } = useContext(ProgramDeliveryContext);
     const { deliveryConfigDiscord } = useContext(ProgramDeliveryContext);
@@ -209,6 +185,7 @@ export const ReadOnlyProgramDelivery = () => {
 export const EditProgramDelivery = ({handleProgramDeliveryDiscordEdit}) => {
     const {deliveryConfigDiscord} = useContext(ProgramDeliveryContext);
     const [dataList, setDataList] = useState(deliveryConfigDiscord);
+    const [selectedIDs, setSelectedIDs] = useState([]);
 
     const handleUpdate = (idx, updatedData) => {
         const updatedList = [...dataList];
@@ -229,11 +206,23 @@ export const EditProgramDelivery = ({handleProgramDeliveryDiscordEdit}) => {
         setDataList(deliveryConfigs)
     };
 
+    const handleSelect = (selectedItem) => {
+        getConfigById(selectedItem).then((results) => {
+            const deepCopy = JSON.parse(JSON.stringify(IProgramDeliveryDiscord));
+            const result = results[0]
+            deepCopy.channel = result.channel
+            deepCopy.channel_name = result.channel_name
+            setDataList((prevData) => [...prevData, deepCopy]);
+            setSelectedIDs((prevIDs) => [...prevIDs, selectedItem.id]);
+        })
+    };
+
     return (
         <Card fluid color='red'>
             <Card.Content>
                 <Card.Header>Delivery Configuration - Discord</Card.Header>
                 <Card.Description>
+                    <MultiSelectAutoCompleteDropdown onSelect={handleSelect} excludeIDs={selectedIDs} />
                     <TableComponent
                         dataList={dataList}
                         onUpdate={handleUpdate}

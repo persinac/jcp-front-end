@@ -8,15 +8,15 @@ import {
     Divider,
     Dropdown, Input
 } from "semantic-ui-react";
-import {ProgramContext, ProgramDeliveryContext} from '../programContext';
-import ReadEditInput from "./General/ReadEditInput";
+import {ProgramContext, ProgramDeliveryContext} from '../../programContext';
+import ReadEditInput from "../General/ReadEditInput";
 import {
     createProgramDeliveryDiscordConfig, createProgramDeliveryEmailConfig,
     getProgramDeliveryDiscordConfigs,
     getProgramDeliveryDiscordConfigsByProgramId, getProgramDeliveryEmailConfigsByProgramId,
     removeProgramDeliveryDiscordConfigs,
     updateProgramDeliveryDiscordConfigs, updateProgramDeliveryEmailConfigs
-} from "../api";
+} from "../../api";
 
 const IProgramDeliveryEmail = {
     id: null,

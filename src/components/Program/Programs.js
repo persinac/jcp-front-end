@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {getPrograms} from "../api"
+import {getPrograms} from "../../api"
 import {Container} from "semantic-ui-react";
-import { ProgramContext } from '../programContext';
+import { ProgramContext } from '../../programContext';
 import ProgramList from "./ProgramList";
 import ProgramDetails from "./ProgramDetails";
 
