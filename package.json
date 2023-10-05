@@ -24,7 +24,8 @@
     "webpack": "latest",
     "webpack-cli": "latest",
     "moment-timezone": "latest",
-    "dayjs": "latest"
+    "dayjs": "latest",
+    "firebase": "latest"
   },
   "scripts": {
     "start:dev": "webpack serve --open --hot --config webpack.dev.js --env ENVIRONMENT=development",

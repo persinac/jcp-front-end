@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { Menu } from 'semantic-ui-react'
+import {logout} from "../firebase";
 
 const NavigationBar = () => {
+
+    const handleLogout = () => {
+        logout();
+    };
 
     return (
         <Menu pointing secondary>
@@ -10,7 +15,7 @@ const NavigationBar = () => {
             <Menu.Item  name='athletes' href="/athletes"/>
             <Menu.Item  name='settings' href="/settings"/>
             <Menu.Menu position='right'>
-                <Menu.Item right name='login' href="/login"/>
+                <Menu.Item right name='logout' onClick={handleLogout}/>
             </Menu.Menu>
         </Menu>
     )
