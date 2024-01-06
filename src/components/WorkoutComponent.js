@@ -143,9 +143,9 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
                     programId: currentProgram['id'],
                     week: weekEdit,
                     day: dayEdit,
-                    movementDescription: item['movement_description'],
-                    movementNotes: item['movement_notes'],
-                    movementOrder: item['movement_order'] || idx + 1
+                    movement_description: item['movement_description'],
+                    movement_notes: item['movement_notes'],
+                    movement_order: item['movement_order'] || idx + 1
                 }
             })
             const newWorkoutResponse = await createNewWorkouts(newMovements)
@@ -162,9 +162,9 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
                     programId: currentProgram['id'],
                     week: weekEdit,
                     day: dayEdit,
-                    movementDescription: item['movement_description'],
-                    movementNotes: item['movement_notes'],
-                    movementOrder: movement_order
+                    movement_description: item['movement_description'],
+                    movement_notes: item['movement_notes'],
+                    movement_order: movement_order
                 }
             })
             const updateWorkoutResponse = await updateWorkouts(movementEditsToSubmit)
