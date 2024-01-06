@@ -64,12 +64,12 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
                 }
                 return {
                     id: null,
-                    programId: currentProgram['id'],
-                    week: deepCopy.week + 1,
+                    program_id: currentProgram['id'],
+                    week: Number(deepCopy.week) + 1,
                     day: item.day,
-                    movementDescription: movement['movement_description'],
-                    movementNotes: movement['movement_notes'],
-                    movementOrder: movement_order
+                    movement_description: movement['movement_description'],
+                    movement_notes: movement['movement_notes'],
+                    movement_order: movement_order
                 }
             })
         })
@@ -107,12 +107,12 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
                         }
                         return {
                             id: movement['id'],
-                            programId: currentProgram['id'],
-                            week: weekWorkout.week - 1,
+                            program_id: currentProgram['id'],
+                            week: Number(weekWorkout.week) - 1,
                             day: item.day,
-                            movementDescription: movement['movement_description'],
-                            movementNotes: movement['movement_notes'],
-                            movementOrder: movement_order
+                            movement_description: movement['movement_description'],
+                            movement_notes: movement['movement_notes'],
+                            movement_order: movement_order
                         }
                     })
                 })
@@ -140,7 +140,7 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
             newMovements = newMovements.map((item, idx) => {
                 return {
                     id: null,
-                    programId: currentProgram['id'],
+                    program_id: currentProgram['id'],
                     week: weekEdit,
                     day: dayEdit,
                     movement_description: item['movement_description'],
@@ -159,7 +159,7 @@ const WorkoutComponent = ({isMobile, workoutData}) => {
                 }
                 return {
                     id: item['id'],
-                    programId: currentProgram['id'],
+                    program_id: currentProgram['id'],
                     week: weekEdit,
                     day: dayEdit,
                     movement_description: item['movement_description'],
