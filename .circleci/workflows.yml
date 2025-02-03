@@ -123,7 +123,7 @@ workflows:
             - doppler
       - deploy_ui:
           requires:
-            - build_admin_ui
+            - build_ui
           context:
             - aws-dev
             - doppler
