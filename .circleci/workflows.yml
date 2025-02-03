@@ -1,8 +1,8 @@
 version: 2.1
 
 orbs:
-  aws-cli: circleci/aws-cli@4.1
-  aws-ecr: circleci/aws-ecr@9.0
+  aws-cli: circleci/aws-cli@5.1.2
+  aws-ecraws-ecr: circleci/aws-ecr@9.3.7
 
 parameters:
   src-modified:
@@ -79,6 +79,12 @@ jobs:
       - setup_branch_name
       - setup_remote_docker:
           docker_layer_caching: true
+      - run:
+          name: What are thou params
+          command: |
+            echo "src-modified: $AWS_ACCOUNT_ID"
+            echo "entry-modified: $JCP_PRD_TOKEN"
+            echo "dockerfile-modified: $AWS_REGION"
       - aws-ecr/build_and_push_image:
           account_id: $AWS_ACCOUNT_ID
           auth:
