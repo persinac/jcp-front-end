@@ -119,11 +119,11 @@ workflows:
     jobs:
       - build_ui:
           context:
-            - aws-dev
+            - aws
             - doppler
       - deploy_ui:
           requires:
             - build_ui
           context:
-            - aws-dev
+            - aws
             - doppler
