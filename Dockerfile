@@ -18,6 +18,7 @@ COPY . .
 # Install dependencies (npm ci makes sure the exact versions in the lockfile gets installed)
 RUN npm ci
 RUN npm run build:prod
+RUN npm run postinstall
 
 # ==== RUN =======
 ENV NODE_ENV production

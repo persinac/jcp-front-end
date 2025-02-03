@@ -14,7 +14,7 @@ const formatTimestamp = (dateToFormat) => {
  PROGRAMS
  ****************/
 export const getProgramCount = async () => {
-    const response = await fetch(`${process.env.API_URL}/api/program/count`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program/count`,
         {
             method: "GET",
             headers: {}
@@ -25,7 +25,7 @@ export const getProgramCount = async () => {
 export const getPrograms = async (currentPage, sortBy) => {
     const pageSize = 10;
     const sortByIDAscDesc = sortBy || "DESC";
-    const response = await fetch(`${process.env.API_URL}/api/program?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortByIDAscDesc}`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortByIDAscDesc}`,
         {
             method: "GET",
             headers: {}
@@ -34,7 +34,7 @@ export const getPrograms = async (currentPage, sortBy) => {
 }
 
 export const updateProgram = async (program) => {
-    const response = await fetch(`${process.env.API_URL}/api/program/${program.id}`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program/${program.id}`,
         {
             method: "PUT",
             body: JSON.stringify({
@@ -50,7 +50,7 @@ export const updateProgram = async (program) => {
 }
 
 export const createProgram = async (program) => {
-    const response = await fetch(`${process.env.API_URL}/api/program`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program`,
         {
             method: "POST",
             body: JSON.stringify(program),
@@ -66,7 +66,7 @@ export const createProgram = async (program) => {
  *********************/
 export const getAllProgramSchedule = async (currentPage, sortBy) => {
     const pageSize = 10;
-    const response = await fetch(`${process.env.API_URL}/api/program-schedule?page=${currentPage}&pageSize=${pageSize}`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-schedule?page=${currentPage}&pageSize=${pageSize}`,
         {
             method: "GET",
             headers: {}
@@ -76,7 +76,7 @@ export const getAllProgramSchedule = async (currentPage, sortBy) => {
 
 export const getProgramScheduleByProgramId = async (programId, currentPage, sortBy) => {
     const pageSize = 10;
-    const response = await fetch(`${process.env.API_URL}/api/program-schedule/program/${programId}?page=${currentPage}&pageSize=${pageSize}`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-schedule/program/${programId}?page=${currentPage}&pageSize=${pageSize}`,
         {
             method: "GET",
             headers: {}
@@ -87,7 +87,7 @@ export const getProgramScheduleByProgramId = async (programId, currentPage, sort
 export const updateProgramSchedule = async (programSchedule) => {
     programSchedule.start_date = formatTimestamp(programSchedule.start_date)
     programSchedule.end_date = formatTimestamp(programSchedule.end_date)
-    const response = await fetch(`${process.env.API_URL}/api/program-schedule/${programSchedule.id}`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-schedule/${programSchedule.id}`,
         {
             method: "PUT",
             body: JSON.stringify(programSchedule),
@@ -100,7 +100,7 @@ export const updateProgramSchedule = async (programSchedule) => {
 export const createProgramSchedule = async (programSchedule) => {
     programSchedule.start_date = formatTimestamp(programSchedule.start_date)
     programSchedule.end_date = formatTimestamp(programSchedule.end_date)
-    const response = await fetch(`${process.env.API_URL}/api/program-schedule`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-schedule`,
         {
             method: "POST",
             body: JSON.stringify(programSchedule),
@@ -114,7 +114,7 @@ export const createProgramSchedule = async (programSchedule) => {
  PROGRAM ASSIGNMENT
  *******************************/
 export const getProgramAssignmentForAssignment = async (programScheduleId) => {
-    const response = await fetch(`${process.env.API_URL}/api/program-assignment/program-schedule/assign/${programScheduleId}?pageSize=1000`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-assignment/program-schedule/assign/${programScheduleId}?pageSize=1000`,
         {
             method: "GET",
             headers: {}
@@ -123,7 +123,7 @@ export const getProgramAssignmentForAssignment = async (programScheduleId) => {
 }
 
 export const createProgramAssignments = async (newProgramAssignments) => {
-    const response = await fetch(`${process.env.API_URL}/api/program-assignment`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-assignment`,
         {
             method: "POST",
             body: JSON.stringify(newProgramAssignments),
@@ -134,7 +134,7 @@ export const createProgramAssignments = async (newProgramAssignments) => {
 }
 
 export const updateProgramAssignments = async (modifiedProgramAssignments) => {
-    const response = await fetch(`${process.env.API_URL}/api/program-assignment`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-assignment`,
         {
             method: "PUT",
             body: JSON.stringify(modifiedProgramAssignments),
@@ -145,7 +145,7 @@ export const updateProgramAssignments = async (modifiedProgramAssignments) => {
 }
 
 export const deleteProgramAssignments = async (programAssignmentIds) => {
-    const response = await fetch(`${process.env.API_URL}/api/program-assignment`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-assignment`,
         {
             method: "DELETE",
             body: JSON.stringify(programAssignmentIds),
@@ -159,7 +159,7 @@ export const deleteProgramAssignments = async (programAssignmentIds) => {
  WORKOUTS
  ********************************/
 export const getWorkoutsByProgramId = async (programId) => {
-    const response = await fetch(`${process.env.API_URL}/api/program-workout/program/${programId}?pageSize=1000`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-workout/program/${programId}?pageSize=1000`,
         {
             method: "GET",
             headers: {}
@@ -168,7 +168,7 @@ export const getWorkoutsByProgramId = async (programId) => {
 }
 
 export const createNewWorkouts = async (listOfNewWorkouts) => {
-    const response = await fetch(`${process.env.API_URL}/api/program-workout`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-workout`,
         {
             method: "POST",
             body: JSON.stringify(listOfNewWorkouts),
@@ -179,7 +179,7 @@ export const createNewWorkouts = async (listOfNewWorkouts) => {
 }
 
 export const updateWorkouts = async (listOfWorkouts) => {
-    const response = await fetch(`${process.env.API_URL}/api/program-workout/update`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-workout/update`,
         {
             method: "PUT",
             body: JSON.stringify(listOfWorkouts),
@@ -190,7 +190,7 @@ export const updateWorkouts = async (listOfWorkouts) => {
 }
 
 export const removeWorkouts = async (workoutIds) => {
-    const response = await fetch(`${process.env.API_URL}/api/program-workout`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/program-workout`,
         {
             method: "DELETE",
             body: JSON.stringify(workoutIds),
@@ -205,7 +205,7 @@ export const removeWorkouts = async (workoutIds) => {
  *******************************/
 
 export const getAthleteCount = async () => {
-    const response = await fetch(`${process.env.API_URL}/api/athlete/count`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/athlete/count`,
         {
             method: "GET",
             headers: {}
@@ -216,7 +216,7 @@ export const getAthleteCount = async () => {
 export const getAthletes = async (currentPage, sortBy) => {
     const pageSize = 10;
     const sortByNameAscDesc = sortBy || "ASC";
-    const response = await fetch(`${process.env.API_URL}/api/athlete?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortByNameAscDesc}`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/athlete?page=${currentPage}&pageSize=${pageSize}&sortBy=${sortByNameAscDesc}`,
         {
             method: "GET",
             headers: {}
@@ -225,7 +225,7 @@ export const getAthletes = async (currentPage, sortBy) => {
 }
 
 export const getAthleteById = async (athleteId) => {
-    const response = await fetch(`${process.env.API_URL}/api/athlete/${athleteId}`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/athlete/${athleteId}`,
         {
             method: "GET",
             headers: {}
@@ -234,7 +234,7 @@ export const getAthleteById = async (athleteId) => {
 }
 
 export const createNewAthlete = async (listOfNewAthletes) => {
-    const response = await fetch(`${process.env.API_URL}/api/athlete/create`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/athlete/create`,
         {
             method: "POST",
             body: JSON.stringify(listOfNewAthletes),
@@ -245,7 +245,7 @@ export const createNewAthlete = async (listOfNewAthletes) => {
 }
 
 export const updateAthlete = async (listOfAthletes) => {
-    const response = await fetch(`${process.env.API_URL}/api/athlete/update`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/athlete/update`,
         {
             method: "PUT",
             body: JSON.stringify(listOfAthletes),
@@ -256,7 +256,7 @@ export const updateAthlete = async (listOfAthletes) => {
 }
 
 export const removeAthletes = async (athleteIds) => {
-    const response = await fetch(`${process.env.API_URL}/api/athlete/remove`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/athlete/remove`,
         {
             method: "DELETE",
             body: JSON.stringify(workoutIds),
@@ -272,7 +272,7 @@ export const removeAthletes = async (athleteIds) => {
  *******************************/
 const programDeliveryDiscordDomain = "program-delivery"
 const programDeliveryDiscordSubDomain = "discord"
-const discordDeliveryURL = `${process.env.API_URL}/api/${programDeliveryDiscordDomain}/${programDeliveryDiscordSubDomain}`
+const discordDeliveryURL = `${process.env.JCP_API_ENDPOINT}/api/${programDeliveryDiscordDomain}/${programDeliveryDiscordSubDomain}`
 export const getProgramDeliveryDiscordConfigs = async (currentPage, sortBy) => {
     const pageSize = 10;
     const sortByNameAscDesc = sortBy || "ASC";
@@ -343,7 +343,7 @@ export const removeProgramDeliveryDiscordConfigs = async (configIds) => {
  *******************************/
 const programDeliveryEmailDomain = "program-delivery"
 const programDeliveryEmailSubDomain = "email"
-const emailDeliveryURL = `${process.env.API_URL}/api/${programDeliveryEmailDomain}/${programDeliveryEmailSubDomain}`
+const emailDeliveryURL = `${process.env.JCP_API_ENDPOINT}/api/${programDeliveryEmailDomain}/${programDeliveryEmailSubDomain}`
 export const getProgramDeliveryEmailConfigs = async (currentPage, sortBy) => {
     const pageSize = 10;
     const sortByNameAscDesc = sortBy || "ASC";
@@ -410,7 +410,7 @@ export const removeProgramDeliveryEmailConfigs = async (configIds) => {
 }
 
 export const getAccountingDataCount = async (table) => {
-    const response = await fetch(`${process.env.API_URL}/api/table/${table}/count`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/table/${table}/count`,
         {
             method: "GET",
             headers: {}
@@ -420,7 +420,7 @@ export const getAccountingDataCount = async (table) => {
 
 export const getAccountingData = async (table, currentPage) => {
     const pageSize = 10;
-    const response = await fetch(`${process.env.API_URL}/api/table/${table}?page=${currentPage}&pageSize=${pageSize}`,
+    const response = await fetch(`${process.env.JCP_API_ENDPOINT}/api/table/${table}?page=${currentPage}&pageSize=${pageSize}`,
         {
             method: "GET",
             headers: {}

@@ -6,6 +6,9 @@ module.exports = merge(common, {
     mode: 'production',
     devtool: 'source-map',
     plugins: [
+        new webpack.DefinePlugin({
+            'process.env': JSON.stringify(process.env) // Ensures process.env is defined
+        }),
         new webpack.EnvironmentPlugin({
             FIREBASE_API_KEY: "asdf123",
             FIREBASE_AUTH_DOMAIN: "xyz.firebaseapp.com",
