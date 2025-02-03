@@ -1,0 +1,129 @@
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@4.1
+  aws-ecr: circleci/aws-ecr@9.0
+
+parameters:
+  src-modified:
+    type: boolean
+    default: false
+  entry-modified:
+    type: boolean
+    default: false
+  dockerfile-modified:
+    type: boolean
+    default: false
+
+commands:
+  setup_branch_name:
+    description: "Setup branch character replacement"
+    steps:
+      - run:
+          name: "Setup branch character replacement"
+          command: |
+            MODIFIED_BRANCH=$(echo "$CIRCLE_BRANCH" | sed 's/\//_/g')
+            echo "export VALID_BRANCH_NAME=\"$MODIFIED_BRANCH\"" >> "$BASH_ENV"
+
+  install_kustomize:
+    description: "Install kustomize"
+    steps:
+      - run:
+          name: Install kustomize
+          command: |
+            URL=https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v4.5.2/kustomize_v4.5.2_linux_amd64.tar.gz
+            curl -L $URL | tar zx
+            [ -w /usr/local/bin ] && SUDO="" || SUDO=sudo
+            $SUDO chmod +x ./kustomize
+            $SUDO mv ./kustomize /usr/local/bin
+
+jobs:
+  bump_docker_tag:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - setup_branch_name
+      - install_kustomize
+      - checkout
+      - run:
+          name: What are thou params
+          command: |
+            echo "src-modified: << pipeline.parameters.src-modified >>"
+            echo "entry-modified: << pipeline.parameters.entry-modified >>"
+            echo "dockerfile-modified: << pipeline.parameters.dockerfile-modified >>"
+      - run:
+          name: Bump Docker Tag
+          command: |
+            echo "Updating ui..."
+            cd manifests
+            REPO_NAME_VAR="$AWS_ECR_URL/jcp-ui"
+            echo "repo name var: $REPO_NAME_VAR"
+            kustomize edit set image $REPO_NAME_VAR=$REPO_NAME_VAR:$VALID_BRANCH_NAME-$CIRCLE_SHA1
+      - add_ssh_keys:
+          fingerprints:
+            - "$SSH_FINGERPRINT"
+      - run:
+          name: Commit & Push to GitHub
+          command: |
+            git config user.email "$GITHUB_EMAIL"
+            git config user.name "CircleCI User"
+            git checkout $CIRCLE_BRANCH 
+            git add manifests/kustomization.yaml
+            git commit -am "Bumps docker tag [skip ci]"
+            git push origin $CIRCLE_BRANCH
+
+  build_ui:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - setup_branch_name
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - aws-ecr/build_and_push_image:
+          account_id: $AWS_ACCOUNT_ID
+          auth:
+            - aws-cli/setup:
+                region: $AWS_REGION
+          create_repo: true
+          dockerfile: Dockerfile
+          extra_build_args: >-
+            --build-arg DOPPLER_TOKEN=$JCP_PRD_TOKEN
+          path: .
+          push_image: true
+          repo: jcp-ui
+          region: $AWS_REGION
+          tag: "$VALID_BRANCH_NAME-$CIRCLE_SHA1"
+
+  deploy_ui:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - setup_branch_name
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:o1pJEPcI1tWvEI4N56S2BEPbDZXHVKu0521pCnyBlJs"
+      - run:
+          name: Deploy to EC2 via SSH
+          command: |
+            ssh -o StrictHostKeyChecking=no ec2-user@$EC2_INSTANCE_PUBLIC_DNS \
+              "aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com && \
+               docker pull $AWS_ECR_URL/jcp-ui:$VALID_BRANCH_NAME-$CIRCLE_SHA1 && \
+               docker stop jcp-ui || true && \
+               docker rm jcp-ui || true && \
+               docker run -d --name jcp-ui -p 3000:8080 $AWS_ECR_URL/jcp-ui:$VALID_BRANCH_NAME-$CIRCLE_SHA1"
+
+workflows:
+  build_and_deploy:
+    jobs:
+      - build_ui:
+          context:
+            - aws-dev
+            - doppler
+      - deploy_ui:
+          requires:
+            - build_admin_ui
+          context:
+            - aws-dev
+            - doppler
