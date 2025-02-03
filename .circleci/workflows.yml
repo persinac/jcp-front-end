@@ -103,7 +103,7 @@ jobs:
           docker_layer_caching: true
       - add_ssh_keys:
           fingerprints:
-            - "SHA256:o1pJEPcI1tWvEI4N56S2BEPbDZXHVKu0521pCnyBlJs"
+            - "SHA256:eLxKyxkXonKKm8V2FFhlNeNUNgRHe9DO89AA61tHrjM"
       - run:
           name: Deploy to EC2 via SSH
           command: |
