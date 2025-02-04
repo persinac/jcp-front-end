@@ -125,6 +125,8 @@ jobs:
 
 workflows:
   build_and_deploy:
+    when:
+      or: [ << pipeline.parameters.src-modified >>, << pipeline.parameters.entry-modified >>, << pipeline.parameters.dockerfile-modified >> ]
     jobs:
       - build_ui:
           context:
