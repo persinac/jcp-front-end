@@ -1,0 +1,42 @@
+.div-card-parent {
+    width: 100%;
+}
+
+.week-card {
+    margin-bottom: 15px;
+}
+
+.centered-modal-override {
+    height: auto !important;
+    top: auto !important;
+    left: auto !important;
+}
+
+.container-width-100 {
+    width: 100% !important;
+}
+
+/* Adjustments for larger screens */
+@media (min-width: 768px) {
+    table {
+        min-width: 718px;
+    }
+}
+
+@media (min-width: 992px) {
+    table {
+        min-width: 942px;
+    }
+}
+
+@media (min-width: 1200px) {
+    table {
+        min-width: 1150px;
+    }
+}
+
+@media (min-width: 1400px) {
+    table {
+        min-width: 1350px;
+    }
+}

@@ -79,14 +79,6 @@ jobs:
       - setup_branch_name
       - setup_remote_docker:
           docker_layer_caching: true
-      - run:
-          name: What are thou params
-          command: |
-            echo "src-modified: $AWS_ACCESS_KEY"
-            echo "src-modified: $AWS_CLI_STR_ACCESS_KEY_ID"
-            echo "entry-modified: $AWS_SECRET_ACCESS_KEY"
-            echo "entry-modified: $AWS_CLI_STR_SECRET_ACCESS_KEY"
-            echo "dockerfile-modified: $AWS_REGION"
       - aws-ecr/build_and_push_image:
           account_id: $AWS_ACCOUNT_ID
           auth:
