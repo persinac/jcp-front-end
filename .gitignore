@@ -34,4 +34,4 @@ ecosystem.dev.config.cjs
 ecosystem.config.cjs
 nginx.md
 *.sh
-.dnc
+do-not-commit/*
