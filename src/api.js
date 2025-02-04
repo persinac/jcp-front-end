@@ -1,4 +1,8 @@
-
+/**
+ * Forcing build
+ * @param dateToFormat
+ * @returns {`${number}-${string}-${string}`}
+ */
 const formatTimestamp = (dateToFormat) => {
     const copyDate = new Date(dateToFormat);
     const year = copyDate.getFullYear();
