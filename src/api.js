@@ -1,5 +1,5 @@
 /**
- * Forcing build
+ * Forcing build - again
  * @param dateToFormat
  * @returns {`${number}-${string}-${string}`}
  */
