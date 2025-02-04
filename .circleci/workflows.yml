@@ -103,6 +103,9 @@ jobs:
       - setup_branch_name
       - setup_remote_docker:
           docker_layer_caching: true
+      - aws-cli/setup:
+          aws_access_key_id: AWS_ACCESS_KEY
+          aws_secret_access_key: AWS_SECRET_ACCESS_KEY
       - add_ssh_keys:
           fingerprints:
             - "SHA256:eLxKyxkXonKKm8V2FFhlNeNUNgRHe9DO89AA61tHrjM"
