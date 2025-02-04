@@ -1,6 +1,6 @@
 const PROGRAM_DOMAIN = "program"
 const NOTES_SUB_DOMAIN = "notes"
-const PROGRAM_NOTES_URL = `${process.env.API_URL}/api/${PROGRAM_DOMAIN}/${NOTES_SUB_DOMAIN}`
+const PROGRAM_NOTES_URL = `${process.env.JCP_API_ENDPOINT}/api/${PROGRAM_DOMAIN}/${NOTES_SUB_DOMAIN}`
 
 export const getNotesCount = async () => {
     const response = await fetch(`${PROGRAM_NOTES_URL}/count`,

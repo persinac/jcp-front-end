@@ -1,6 +1,6 @@
 const SETTINGS_DOMAIN = "settings"
 const DISCORD_SUB_DOMAIN = "discord"
-const SETTINGS_DISCORD_URL = `${process.env.API_URL}/api/${SETTINGS_DOMAIN}/${DISCORD_SUB_DOMAIN}`
+const SETTINGS_DISCORD_URL = `${process.env.JCP_API_ENDPOINT}/api/${SETTINGS_DOMAIN}/${DISCORD_SUB_DOMAIN}`
 
 export const getDiscordSettingsCount = async () => {
     const response = await fetch(`${SETTINGS_DISCORD_URL}/count`,
